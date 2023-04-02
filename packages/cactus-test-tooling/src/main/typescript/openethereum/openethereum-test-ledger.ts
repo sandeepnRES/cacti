@@ -291,17 +291,19 @@ export class OpenEthereumTestLedger {
   ): Promise<TransactionReceipt> {
     // Encode ABI
     const contractProxy = new this.web3.eth.Contract(abi);
-    const contractTx = contractProxy.deploy({
-      data: bytecode,
-      arguments: args,
-    });
+    const encodedDeployReq = contractProxy
+      .deploy({
+        data: bytecode,
+        arguments: args,
+      })
+      .encodeABI();
 
     // Send TX
     const signedTx = await this.web3.eth.accounts.signTransaction(
       {
         from: K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
-        data: contractTx.encodeABI(),
-        gas: 8000000, // Max possible gas
+        data: encodedDeployReq,
+        gas: 1000000,
         nonce: await this.web3.eth.getTransactionCount(
           K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
         ),

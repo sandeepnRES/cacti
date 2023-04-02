@@ -139,11 +139,7 @@
         "uuidv",
         "vscc",
         "wasm",
-        "Xdai",
-        "goquorum",
-        "hada",
-        "undici",
-        "ossp"
+        "Xdai"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"
