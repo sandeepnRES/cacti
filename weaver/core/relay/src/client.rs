@@ -46,7 +46,7 @@ async fn datasharing() -> Result<(), Box<dyn std::error::Error>> {
     match ack::Status::from_i32(response.get_ref().status) {
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
-                poll_for_state(request_id.to_string(), network_client, 0).await;
+                poll_for_state(request_id.to_string(), network_client).await;
                 println!("Data Sharing: Success!");
             }
             ack::Status::Error => {
@@ -65,7 +65,6 @@ async fn datasharing() -> Result<(), Box<dyn std::error::Error>> {
 fn poll_for_state(
     request_id: String,
     mut network_client: NetworkClient<tonic::transport::Channel>,
-    iter: u32,
 ) -> BoxFuture<'static, ()> {
     async move {
         sleep(time::Duration::from_millis(2000));
@@ -78,9 +77,8 @@ fn poll_for_state(
                 println!("Get state response: {:?}", response);
                 match request_state::Status::from_i32(response.get_ref().status) {
                     Some(request_status) => {
-                        if request_status == request_state::Status::Pending ||
-                           request_status == request_state::Status::PendingAck {
-                            poll_for_state(request_id, network_client, iter+1).await;
+                        if request_status == request_state::Status::Pending {
+                            poll_for_state(request_id, network_client).await;
                         } else if request_status == request_state::Status::Error {
                             println!("Error");
                             std::process::exit(1);
@@ -156,7 +154,7 @@ async fn event_suscribe(driver: bool) -> Result<(), Box<dyn std::error::Error>> 
     match ack::Status::from_i32(response.get_ref().status) {
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
-                poll_for_event_subscription(request_id.clone().to_string(), network_client, 0).await;
+                poll_for_event_subscription(request_id.clone().to_string(), network_client).await;
             }
             ack::Status::Error => {
                 println!("An error occurred in subscribe_event call");
@@ -241,7 +239,7 @@ async fn event_unsuscribe(request_id: String, driver: bool) -> Result<(), Box<dy
     match ack::Status::from_i32(response.get_ref().status) {
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
-                poll_for_event_subscription(request_id.to_string(), network_client, 0).await;
+                poll_for_event_subscription(request_id.to_string(), network_client).await;
             }
             ack::Status::Error => {
                 println!("An error occurred in unsubscribe_event call");
@@ -259,7 +257,6 @@ async fn event_unsuscribe(request_id: String, driver: bool) -> Result<(), Box<dy
 fn poll_for_event_subscription(
     request_id: String,
     mut network_client: NetworkClient<tonic::transport::Channel>,
-    iter: u32,
 ) -> BoxFuture<'static, ()> {
     async move {
         sleep(time::Duration::from_millis(2000));
@@ -277,7 +274,7 @@ fn poll_for_event_subscription(
                             request_status == event_subscription_state::Status::UnsubscribePending ||
                             request_status == event_subscription_state::Status::SubscribePendingAck ||
                             request_status == event_subscription_state::Status::SubscribePendingAck {
-                            poll_for_event_subscription(request_id, network_client, iter+1).await;
+                            poll_for_event_subscription(request_id, network_client).await;
                         } else if request_status == event_subscription_state::Status::Subscribed {
                             println!("Event Subscription: Success!");
                         } else if request_status == event_subscription_state::Status::Unsubscribed {

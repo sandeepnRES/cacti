@@ -1,88 +1,68 @@
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct DbName {
     #[prost(string, tag = "1")]
-    pub name: ::prost::alloc::string::String,
+    pub name: std::string::String,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct RelayDatabase {
     #[prost(map = "string, string", tag = "1")]
-    pub pairs: ::std::collections::HashMap<
-        ::prost::alloc::string::String,
-        ::prost::alloc::string::String,
-    >,
+    pub pairs: ::std::collections::HashMap<std::string::String, std::string::String>,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct GetStateMessage {
     #[prost(string, tag = "1")]
-    pub request_id: ::prost::alloc::string::String,
+    pub request_id: std::string::String,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct NetworkQuery {
     #[prost(string, repeated, tag = "1")]
-    pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    pub policy: ::std::vec::Vec<std::string::String>,
     #[prost(string, tag = "2")]
-    pub address: ::prost::alloc::string::String,
+    pub address: std::string::String,
     #[prost(string, tag = "3")]
-    pub requesting_relay: ::prost::alloc::string::String,
+    pub requesting_relay: std::string::String,
     #[prost(string, tag = "4")]
-    pub requesting_network: ::prost::alloc::string::String,
+    pub requesting_network: std::string::String,
     #[prost(string, tag = "5")]
-    pub certificate: ::prost::alloc::string::String,
+    pub certificate: std::string::String,
     #[prost(string, tag = "6")]
-    pub requestor_signature: ::prost::alloc::string::String,
+    pub requestor_signature: std::string::String,
     #[prost(string, tag = "7")]
-    pub nonce: ::prost::alloc::string::String,
+    pub nonce: std::string::String,
     #[prost(string, tag = "8")]
-    pub requesting_org: ::prost::alloc::string::String,
+    pub requesting_org: std::string::String,
     #[prost(bool, tag = "9")]
     pub confidential: bool,
 }
 /// Below message is used for network/client to dest-relay communication
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct NetworkEventSubscription {
     #[prost(message, optional, tag = "1")]
-    pub event_matcher: ::core::option::Option<
-        super::super::common::events::EventMatcher,
-    >,
+    pub event_matcher: ::std::option::Option<super::super::common::events::EventMatcher>,
     #[prost(message, optional, tag = "2")]
-    pub query: ::core::option::Option<NetworkQuery>,
+    pub query: ::std::option::Option<NetworkQuery>,
     #[prost(message, optional, tag = "3")]
-    pub event_publication_spec: ::core::option::Option<
-        super::super::common::events::EventPublication,
-    >,
+    pub event_publication_spec:
+        ::std::option::Option<super::super::common::events::EventPublication>,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]
 pub struct NetworkEventUnsubscription {
     #[prost(message, optional, tag = "1")]
-    pub request: ::core::option::Option<NetworkEventSubscription>,
+    pub request: ::std::option::Option<NetworkEventSubscription>,
     #[prost(string, tag = "2")]
-    pub request_id: ::prost::alloc::string::String,
+    pub request_id: std::string::String,
 }
-/// Generated client implementations.
+#[doc = r" Generated client implementations."]
 pub mod network_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(unused_variables, dead_code, missing_docs)]
     use tonic::codegen::*;
-    use tonic::codegen::http::Uri;
-    /// This service is the interface for how the network communicates with
-    /// its relay.
-    #[derive(Debug, Clone)]
+    #[doc = " This service is the interface for how the network communicates with"]
+    #[doc = " its relay."]
     pub struct NetworkClient<T> {
         inner: tonic::client::Grpc<T>,
     }
     impl NetworkClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
+        #[doc = r" Attempt to create a new client by connecting to a given endpoint."]
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
             D: std::convert::TryInto<tonic::transport::Endpoint>,
@@ -95,144 +75,85 @@ pub mod network_client {
     impl<T> NetworkClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::ResponseBody: Body + HttpBody + Send + 'static,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        <T::ResponseBody as HttpBody>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
             Self { inner }
         }
-        pub fn with_origin(inner: T, origin: Uri) -> Self {
-            let inner = tonic::client::Grpc::with_origin(inner, origin);
+        pub fn with_interceptor(inner: T, interceptor: impl Into<tonic::Interceptor>) -> Self {
+            let inner = tonic::client::Grpc::with_interceptor(inner, interceptor);
             Self { inner }
         }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> NetworkClient<InterceptedService<T, F>>
-        where
-            F: tonic::service::Interceptor,
-            T::ResponseBody: Default,
-            T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-                Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                >,
-            >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
-        {
-            NetworkClient::new(InterceptedService::new(inner, interceptor))
-        }
-        /// Compress requests with the given encoding.
-        ///
-        /// This requires the server to support it otherwise it might respond with an
-        /// error.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.send_compressed(encoding);
-            self
-        }
-        /// Enable decompressing responses.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.accept_compressed(encoding);
-            self
-        }
-        /// Data Sharing endpoints
-        /// endpoint for a network to request remote relay state via local relay
+        #[doc = " Data Sharing endpoints"]
+        #[doc = " endpoint for a network to request remote relay state via local relay"]
         pub async fn request_state(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkQuery>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/RequestState",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/networks.networks.Network/RequestState");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// This rpc endpoint is for polling the local relay for request state.
+        #[doc = " This rpc endpoint is for polling the local relay for request state."]
         pub async fn get_state(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::state::RequestState>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> Result<tonic::Response<super::super::super::common::state::RequestState>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/GetState",
-            );
+            let path = http::uri::PathAndQuery::from_static("/networks.networks.Network/GetState");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// NOTE: This rpc is just for debugging.
+        #[doc = " NOTE: This rpc is just for debugging."]
         pub async fn request_database(
             &mut self,
             request: impl tonic::IntoRequest<super::DbName>,
         ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/RequestDatabase",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/networks.networks.Network/RequestDatabase");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Event endpoints
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
+        #[doc = " Event endpoints"]
+        #[doc = " endpoint for a client to subscribe to event via local relay initiating subscription flow."]
         pub async fn subscribe_event(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkEventSubscription>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/SubscribeEvent",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/networks.networks.Network/SubscribeEvent");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// This rpc endpoint is for polling the local relay for subscription state.
+        #[doc = " This rpc endpoint is for polling the local relay for subscription state."]
         pub async fn get_event_subscription_state(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
@@ -240,109 +161,96 @@ pub mod network_client {
             tonic::Response<super::super::super::common::events::EventSubscriptionState>,
             tonic::Status,
         > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/GetEventSubscriptionState",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
+        #[doc = " endpoint for a client to subscribe to event via local relay initiating subscription flow."]
         pub async fn unsubscribe_event(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkEventUnsubscription>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/UnsubscribeEvent",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/networks.networks.Network/UnsubscribeEvent");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// endpoint for a client to fetch received events.
-        /// Note: events are marked as deleted from relay database as soon as client fetches them.
+        #[doc = " endpoint for a client to fetch received events. "]
+        #[doc = " Note: events are marked as deleted from relay database as soon as client fetches them."]
         pub async fn get_event_states(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::events::EventStates>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> Result<tonic::Response<super::super::super::common::events::EventStates>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/GetEventStates",
-            );
+            let path =
+                http::uri::PathAndQuery::from_static("/networks.networks.Network/GetEventStates");
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
+    impl<T: Clone> Clone for NetworkClient<T> {
+        fn clone(&self) -> Self {
+            Self {
+                inner: self.inner.clone(),
+            }
+        }
+    }
+    impl<T> std::fmt::Debug for NetworkClient<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "NetworkClient {{ ... }}")
+        }
+    }
 }
-/// Generated server implementations.
+#[doc = r" Generated server implementations."]
 pub mod network_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(unused_variables, dead_code, missing_docs)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with NetworkServer.
+    #[doc = "Generated trait containing gRPC methods that should be implemented for use with NetworkServer."]
     #[async_trait]
     pub trait Network: Send + Sync + 'static {
-        /// Data Sharing endpoints
-        /// endpoint for a network to request remote relay state via local relay
+        #[doc = " Data Sharing endpoints"]
+        #[doc = " endpoint for a network to request remote relay state via local relay"]
         async fn request_state(
             &self,
             request: tonic::Request<super::NetworkQuery>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        >;
-        /// This rpc endpoint is for polling the local relay for request state.
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status>;
+        #[doc = " This rpc endpoint is for polling the local relay for request state."]
         async fn get_state(
             &self,
             request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::state::RequestState>,
-            tonic::Status,
-        >;
-        /// NOTE: This rpc is just for debugging.
+        ) -> Result<tonic::Response<super::super::super::common::state::RequestState>, tonic::Status>;
+        #[doc = " NOTE: This rpc is just for debugging."]
         async fn request_database(
             &self,
             request: tonic::Request<super::DbName>,
         ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
-        /// Event endpoints
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
+        #[doc = " Event endpoints"]
+        #[doc = " endpoint for a client to subscribe to event via local relay initiating subscription flow."]
         async fn subscribe_event(
             &self,
             request: tonic::Request<super::NetworkEventSubscription>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        >;
-        /// This rpc endpoint is for polling the local relay for subscription state.
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status>;
+        #[doc = " This rpc endpoint is for polling the local relay for subscription state."]
         async fn get_event_subscription_state(
             &self,
             request: tonic::Request<super::GetStateMessage>,
@@ -350,80 +258,48 @@ pub mod network_server {
             tonic::Response<super::super::super::common::events::EventSubscriptionState>,
             tonic::Status,
         >;
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
+        #[doc = " endpoint for a client to subscribe to event via local relay initiating subscription flow."]
         async fn unsubscribe_event(
             &self,
             request: tonic::Request<super::NetworkEventUnsubscription>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::ack::Ack>,
-            tonic::Status,
-        >;
-        /// endpoint for a client to fetch received events.
-        /// Note: events are marked as deleted from relay database as soon as client fetches them.
+        ) -> Result<tonic::Response<super::super::super::common::ack::Ack>, tonic::Status>;
+        #[doc = " endpoint for a client to fetch received events. "]
+        #[doc = " Note: events are marked as deleted from relay database as soon as client fetches them."]
         async fn get_event_states(
             &self,
             request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::events::EventStates>,
-            tonic::Status,
-        >;
+        ) -> Result<tonic::Response<super::super::super::common::events::EventStates>, tonic::Status>;
     }
-    /// This service is the interface for how the network communicates with
-    /// its relay.
+    #[doc = " This service is the interface for how the network communicates with"]
+    #[doc = " its relay."]
     #[derive(Debug)]
+    #[doc(hidden)]
     pub struct NetworkServer<T: Network> {
         inner: _Inner<T>,
-        accept_compression_encodings: EnabledCompressionEncodings,
-        send_compression_encodings: EnabledCompressionEncodings,
     }
-    struct _Inner<T>(Arc<T>);
+    struct _Inner<T>(Arc<T>, Option<tonic::Interceptor>);
     impl<T: Network> NetworkServer<T> {
         pub fn new(inner: T) -> Self {
-            Self::from_arc(Arc::new(inner))
+            let inner = Arc::new(inner);
+            let inner = _Inner(inner, None);
+            Self { inner }
         }
-        pub fn from_arc(inner: Arc<T>) -> Self {
-            let inner = _Inner(inner);
-            Self {
-                inner,
-                accept_compression_encodings: Default::default(),
-                send_compression_encodings: Default::default(),
-            }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> InterceptedService<Self, F>
-        where
-            F: tonic::service::Interceptor,
-        {
-            InterceptedService::new(Self::new(inner), interceptor)
-        }
-        /// Enable decompressing requests with the given encoding.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.accept_compression_encodings.enable(encoding);
-            self
-        }
-        /// Compress responses with the given encoding, if the client supports it.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.send_compression_encodings.enable(encoding);
-            self
+        pub fn with_interceptor(inner: T, interceptor: impl Into<tonic::Interceptor>) -> Self {
+            let inner = Arc::new(inner);
+            let inner = _Inner(inner, Some(interceptor.into()));
+            Self { inner }
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for NetworkServer<T>
+    impl<T, B> Service<http::Request<B>> for NetworkServer<T>
     where
         T: Network,
-        B: Body + Send + 'static,
+        B: HttpBody + Send + Sync + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
-        type Error = std::convert::Infallible;
+        type Error = Never;
         type Future = BoxFuture<Self::Response, Self::Error>;
-        fn poll_ready(
-            &mut self,
-            _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -432,36 +308,29 @@ pub mod network_server {
                 "/networks.networks.Network/RequestState" => {
                     #[allow(non_camel_case_types)]
                     struct RequestStateSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::NetworkQuery>
-                    for RequestStateSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::NetworkQuery> for RequestStateSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::NetworkQuery>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).request_state(request).await
-                            };
+                            let fut = async move { inner.request_state(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = RequestStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -470,34 +339,29 @@ pub mod network_server {
                 "/networks.networks.Network/GetState" => {
                     #[allow(non_camel_case_types)]
                     struct GetStateSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetStateSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage> for GetStateSvc<T> {
                         type Response = super::super::super::common::state::RequestState;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move { (*inner).get_state(request).await };
+                            let fut = async move { inner.get_state(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = GetStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -506,36 +370,26 @@ pub mod network_server {
                 "/networks.networks.Network/RequestDatabase" => {
                     #[allow(non_camel_case_types)]
                     struct RequestDatabaseSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::DbName>
-                    for RequestDatabaseSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::DbName> for RequestDatabaseSvc<T> {
                         type Response = super::RelayDatabase;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::DbName>,
-                        ) -> Self::Future {
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+                        fn call(&mut self, request: tonic::Request<super::DbName>) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).request_database(request).await
-                            };
+                            let fut = async move { inner.request_database(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = RequestDatabaseSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -544,38 +398,31 @@ pub mod network_server {
                 "/networks.networks.Network/SubscribeEvent" => {
                     #[allow(non_camel_case_types)]
                     struct SubscribeEventSvc<T: Network>(pub Arc<T>);
-                    impl<
-                        T: Network,
-                    > tonic::server::UnaryService<super::NetworkEventSubscription>
-                    for SubscribeEventSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::NetworkEventSubscription>
+                        for SubscribeEventSvc<T>
+                    {
                         type Response = super::super::super::common::ack::Ack;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::NetworkEventSubscription>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).subscribe_event(request).await
-                            };
+                            let fut = async move { inner.subscribe_event(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = SubscribeEventSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -585,35 +432,31 @@ pub mod network_server {
                     #[allow(non_camel_case_types)]
                     struct GetEventSubscriptionStateSvc<T: Network>(pub Arc<T>);
                     impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetEventSubscriptionStateSvc<T> {
+                        for GetEventSubscriptionStateSvc<T>
+                    {
                         type Response = super::super::super::common::events::EventSubscriptionState;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_event_subscription_state(request).await
-                            };
+                            let fut =
+                                async move { inner.get_event_subscription_state(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = GetEventSubscriptionStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -622,38 +465,31 @@ pub mod network_server {
                 "/networks.networks.Network/UnsubscribeEvent" => {
                     #[allow(non_camel_case_types)]
                     struct UnsubscribeEventSvc<T: Network>(pub Arc<T>);
-                    impl<
-                        T: Network,
-                    > tonic::server::UnaryService<super::NetworkEventUnsubscription>
-                    for UnsubscribeEventSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::NetworkEventUnsubscription>
+                        for UnsubscribeEventSvc<T>
+                    {
                         type Response = super::super::super::common::ack::Ack;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::NetworkEventUnsubscription>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).unsubscribe_event(request).await
-                            };
+                            let fut = async move { inner.unsubscribe_event(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = UnsubscribeEventSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
@@ -662,69 +498,53 @@ pub mod network_server {
                 "/networks.networks.Network/GetEventStates" => {
                     #[allow(non_camel_case_types)]
                     struct GetEventStatesSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetEventStatesSvc<T> {
+                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage> for GetEventStatesSvc<T> {
                         type Response = super::super::super::common::events::EventStates;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
+                        type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
                         fn call(
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_event_states(request).await
-                            };
+                            let fut = async move { inner.get_event_states(request).await };
                             Box::pin(fut)
                         }
                     }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
                     let inner = self.inner.clone();
                     let fut = async move {
+                        let interceptor = inner.1.clone();
                         let inner = inner.0;
                         let method = GetEventStatesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
+                        let mut grpc = if let Some(interceptor) = interceptor {
+                            tonic::server::Grpc::with_interceptor(codec, interceptor)
+                        } else {
+                            tonic::server::Grpc::new(codec)
+                        };
                         let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
                 }
-                _ => {
-                    Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", "12")
-                                .header("content-type", "application/grpc")
-                                .body(empty_body())
-                                .unwrap(),
-                        )
-                    })
-                }
+                _ => Box::pin(async move {
+                    Ok(http::Response::builder()
+                        .status(200)
+                        .header("grpc-status", "12")
+                        .body(tonic::body::BoxBody::empty())
+                        .unwrap())
+                }),
             }
         }
     }
     impl<T: Network> Clone for NetworkServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
-            Self {
-                inner,
-                accept_compression_encodings: self.accept_compression_encodings,
-                send_compression_encodings: self.send_compression_encodings,
-            }
+            Self { inner }
         }
     }
     impl<T: Network> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(self.0.clone(), self.1.clone())
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -732,7 +552,7 @@ pub mod network_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: Network> tonic::server::NamedService for NetworkServer<T> {
+    impl<T: Network> tonic::transport::NamedService for NetworkServer<T> {
         const NAME: &'static str = "networks.networks.Network";
     }
 }

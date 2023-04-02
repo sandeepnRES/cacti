@@ -172,7 +172,6 @@ class Relay {
             if (dateObj.getTime() < Date.now()) {
                 throw new Error("Timeout: State is still pending.");
             } else {
-                await helpers.delay(1000);
                 return await this.recursiveState(requestID, dateObj);
             }
         } else {
@@ -306,7 +305,6 @@ class Relay {
             if (dateObj.getTime() < Date.now()) {
                 throw new Error("Timeout: State is still pending.");
             } else {
-                await helpers.delay(1000);
                 return await this.recursiveEventSubscriptionState(requestID, dateObj);
             }
         } else {
