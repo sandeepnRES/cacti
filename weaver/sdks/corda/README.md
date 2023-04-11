@@ -56,7 +56,7 @@ To use the SDK, add following in your `build.gradle`:
 ```
 repositories {
     maven {
-        url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
+        url https://maven.pkg.github.com/hyperledger/cacti
         credentials {
             username <github-email>
             password <github-personal-access-token>
