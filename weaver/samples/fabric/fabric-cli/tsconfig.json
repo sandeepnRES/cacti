@@ -20,6 +20,7 @@
     "strict": false,
     "target": "es5",
     "declaration": true,
+    "rootDir": "./",
     "declarationDir": "build/types"
   },
   "include": ["src/**/*"],
