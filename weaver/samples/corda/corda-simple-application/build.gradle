@@ -12,10 +12,9 @@ buildscript {
         junit_version = constants.getProperty("junitVersion")
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
+        arrow_version = constants.getProperty("arrowVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
-        cacti_version = constants.getProperty("cactiVersion")  
-        tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
-        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
+        cacti_version = constants.getProperty("cactiVersion")     
     }
 
     repositories {
@@ -78,6 +77,8 @@ allprojects {
                 dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
                 dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
                 dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+                dirs '../../../common/protos-java-kt/build/libs'
+                dirs '../../../../common/protos-java-kt/build/libs'
             }
         }
     }

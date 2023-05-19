@@ -9,12 +9,23 @@ package common.asset_transfer;
 option java_package = "org.hyperledger.cacti.weaver.protos.common.asset_transfer";
 option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common";
 
+enum TxType {
+	MINT = 0;
+	UPDATE = 1;
+	BURN = 2;
+}
+message PledgeCondition {
+	TxType txType = 1;
+	bytes condition = 2;
+}
+
 message AssetPledge {
 	bytes assetDetails = 1;
 	string localNetworkID = 2;
 	string remoteNetworkID = 3;
 	string recipient = 4;
 	uint64 expiryTimeSecs = 5;
+	bytes pledgeCondition = 6;
 }
 
 message AssetClaimStatus {
@@ -25,4 +36,5 @@ message AssetClaimStatus {
 	bool claimStatus = 5;
 	uint64 expiryTimeSecs = 6;
 	bool expirationStatus = 7;
+	bytes pledgeCondition = 8;
 }
