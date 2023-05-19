@@ -135,11 +135,19 @@ constructor(
                 val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())!!
                 val notary = networkIdStateRef.state.notary
                 val borrower = assetExchangeHTLCState.locker
+<<<<<<< HEAD
                 /* val pledgeCmd = Command(AssetTransferContract.Commands.Pledge(),
                     listOf(
                         ourIdentity.owningKey
                     )
                 ) */
+=======
+                val pledgeCmd = Command(AssetTransferContract.Commands.Pledge(),
+                    listOf(
+                        ourIdentity.owningKey
+                    )
+                )
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
                 val assetLoanPledgeCmd = Command(BondAssetContract.Commands.LoanPledge(),
                     setOf(
                         ourIdentity.owningKey,
@@ -184,8 +192,21 @@ constructor(
                     .addInputState(inputState)
                     .addOutputState(assetPledgeState, AssetTransferContract.ID)
                     .addCommand(assetHTLCClaimCmd)
+<<<<<<< HEAD
                     .addCommand(assetLoanPledgeCmd)
                     .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+=======
+                    .addCommand(assetLoanPledgeCmd).apply {
+                        networkIdStateRef.let {
+                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                        }
+                    }
+                    .addCommand(pledgeCmd).apply {
+                        networkIdStateRef.let {
+                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                        }
+                    }
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
                     .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
                 
                 // Verify and collect signatures on the transaction
@@ -229,6 +250,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
     @Suspendable
     override fun call(): SignedTransaction {
         val role = session.receive<AssetLoanResponderRole>().unwrap { it }
+<<<<<<< HEAD
         fun checkLoanPledge(tx: LedgerTransaction): Boolean {
             val assetStates = tx.inputsOfType<BondAssetState>()
             val htlcStates = tx.inputsOfType<AssetExchangeHTLCState>()
@@ -259,6 +281,11 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val lTx = stx.tx.toLedgerTransaction(serviceHub)
                     "Loan Pledge conditions should be satisified" using (checkLoanPledge(lTx) == true)
+=======
+        if (role == AssetLoanResponderRole.SIGNER) {
+            val signTransactionFlow = object : SignTransactionFlow(session) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
                 }
             }
             try {
@@ -273,7 +300,10 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
             val signTransactionFlow = object : SignTransactionFlow(session) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val lTx = stx.tx.toLedgerTransaction(serviceHub)
+<<<<<<< HEAD
                     "Loan Pledge conditions should be satisified" using (checkLoanPledge(lTx) == true)
+=======
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
                     val htlcState = lTx.inputsOfType<AssetExchangeHTLCState>()[0]
                     val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
                     val myCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
@@ -406,8 +436,16 @@ constructor(
             .addInputState(remotePledgeRef)
             .addOutputState(claimAssetState, BondAssetContract.ID)
             .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
+<<<<<<< HEAD
             .addCommand(claimCmd)
             .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+=======
+            .addCommand(claimCmd).apply {
+                networkIdStateRef.let {
+                    this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                }
+            }
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
             .addCommand(assetCreateCmd)
             .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
         
@@ -612,8 +650,16 @@ constructor(
             .addInputState(remoteClaimStatusRef)
             .addOutputState(claimAssetState, BondAssetContract.ID)
             .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
+<<<<<<< HEAD
             .addCommand(claimCmd)
             .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+=======
+            .addCommand(claimCmd).apply {
+                networkIdStateRef.let {
+                    this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                }
+            }
+>>>>>>> cb39c9838 (feat(assetloan): added pledgeCondition in pledge, added loan workflows in corda)
             .addCommand(assetCreateCmd)
             .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
         
