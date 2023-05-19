@@ -41,6 +41,12 @@ configurations {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.8.6'
+
+    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    
+    implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
     implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
     implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "$cacti_version")
 

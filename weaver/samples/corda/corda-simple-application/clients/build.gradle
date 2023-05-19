@@ -5,7 +5,6 @@ buildscript {
     ext.bcprov_version = "1.53"
     ext.grpc_version = "1.29.0" // CURRENT_GRPC_VERSION
     ext.grpc_kotlin_version = "0.1.4" // CURRENT_GRPC_KOTLIN_VERSION
-    ext.arrow_version = "0.10.4"
 
     repositories {
         mavenCentral()
