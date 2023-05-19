@@ -99,13 +99,22 @@ constructor(
 
             println("Local network id is ${pledgeArgs.localNetworkId} and remote network id is ${pledgeArgs.remoteNetworkId}")
 
-            subFlow(PledgeAsset.Initiator(
+            val assetPledgeState = AssetPledgeState(
+                StaticPointer(assetRef!!.ref, assetRef!!.state.data.javaClass), // @property assetStatePointer
+                ourIdentity, // @property locker
+                "",
+                pledgeArgs.recipientCert,
                 pledgeArgs.expiryTimeSecs,
+                "",
+                pledgeArgs.remoteNetworkId,
+                pledgeArgs.pledgeCondition,
+                pledgeArgs.recipient
+            )
+
+            subFlow(PledgeAsset.Initiator(
+                assetPledgeState,
                 assetRef!!,
                 pledgeArgs.deleteAssetStateCommand,
-                pledgeArgs.recipientCert,
-                pledgeArgs.localNetworkId,
-                pledgeArgs.remoteNetworkId,
                 pledgeArgs.issuer,
                 pledgeArgs.observers
             ))

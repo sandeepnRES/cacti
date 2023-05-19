@@ -10,6 +10,7 @@ import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetClaimStatusState
 import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
 import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetExchangeHTLCState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
@@ -56,8 +57,16 @@ class AssetTransferContract : Contract {
                 "Locker must be the owner of pledged asset" using inputState.participants.containsAll(listOf(pledgeState.locker))
                 
                 // Check if asset consumed (input state) is the same used in pledge
-                val assetPointer = StaticPointer(tx.inputs[0].ref, tx.inputs[0].state.data.javaClass)
-                "Asset consumed should be the one used in pledge." using (assetPointer.equals(pledgeState.assetStatePointer))
+                val inputPledgeStates = tx.inputsOfType<AssetPledgeState>()
+                val inputHTLCStates = tx.inputsOfType<AssetExchangeHTLCState>()
+                val assetPointer = if (inputHTLCStates.size == 1) {
+                    inputHTLCStates[0].assetStatePointer
+                } else if(inputPledgeStates.size == 1) {
+                    inputPledgeStates[0].assetStatePointer
+                } else {
+                    StaticPointer(tx.inputs[0].ref, tx.inputs[0].state.data.javaClass)
+                }
+                "Asset consumed should be the one used in pledge." using (assetPointer!!.equals(pledgeState.assetStatePointer))
                 
                 // Check if the locker is a signer
                 val requiredSigners = pledgeState.participants.map { it.owningKey }
