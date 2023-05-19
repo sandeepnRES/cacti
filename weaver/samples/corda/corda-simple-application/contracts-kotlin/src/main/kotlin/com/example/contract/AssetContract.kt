@@ -7,11 +7,18 @@
 package com.cordaSimpleApplication.contract
 
 import com.cordaSimpleApplication.state.AssetState
+import com.cordaSimpleApplication.state.AssetStateJSON
+import com.cordaSimpleApplication.state.LoanRepaymentCondition
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
+import com.google.gson.Gson
+import com.google.protobuf.ByteString
+
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
+import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
 
 /**
  * An implementation of a sample asset in Corda.
@@ -95,6 +102,32 @@ class AssetContract : Contract {
                 val requiredSigners = listOf(inputState.owner.owningKey, outputState.owner.owningKey)
                 "The owners of the input and output assets must be the signers." using (command.signers.containsAll(requiredSigners))
             }
+            is AssetContract.Commands.LoanPledge -> requireThat {
+                // Generic constraints around the transaction that transfers ownership of an asset from one Party to other Party
+                val assetStates = tx.inputsOfType<AssetState>()
+                "There should be oneAssetState as input." using (assetStates.size == 1)
+                "There should be one output AssetPledgeState." using (tx.outputsOfType<AssetPledgeState>().size == 1)
+                
+                val assetState = assetStates[0]
+                val pledgeState = tx.outputsOfType<AssetPledgeState>()[0]
+                val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                
+                "Pledge asset should be same as in pledge condition." using (assetState.quantity == pledgeCondition.tokenQuantity
+                    && assetState.tokenType == pledgeCondition.tokenType
+                )
+                
+                "Borrower should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.tokenLedgerBorrowerCert)
+                "Lender should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerLenderCert)
+                
+                val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                "There should be a single reference input network id." using (inReferences.size == 1)
+
+                val validNetworkIdState = inReferences.get(0).state.data
+                "Asset ledger should be correct in pledge condition." using (pledgeCondition.tokenLedgerId.equals(validNetworkIdState.networkId))
+                
+                val requiredSigners = listOf(assetState.owner.owningKey)
+                "The asset owner must be the signer." using (command.signers.containsAll(requiredSigners))
+            }
         }
     }
 
@@ -107,6 +140,7 @@ class AssetContract : Contract {
         class Merge : Commands
         class Split : Commands
         class Transfer : Commands
+        class LoanPledge: Commands
 
         // Flow that will read the total fungible token assets of a given type
     }

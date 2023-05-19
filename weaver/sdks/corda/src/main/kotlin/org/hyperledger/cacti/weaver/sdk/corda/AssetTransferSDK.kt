@@ -58,6 +58,8 @@ class AssetTransferSDK {
                         expiryTimeSecs, // @property expiryTimeSecs
                         getAssetStateAndRefFlow, // @property getAssetStateAndRefFlow
                         deleteAssetStateCommand, // @property deleteAssetStateCommand
+                        ByteArray(0), // Empty pledge condition for asset transfer
+                        null,
                         issuer, // @property issuer
                         observers // @property observers
                     )
@@ -103,6 +105,8 @@ class AssetTransferSDK {
                         expiryTimeSecs, // @property expiryTimeSecs
                         getAssetStateAndRefFlow, // @property getAssetStateAndRefFlow
                         deleteAssetStateCommand, // @property deleteAssetStateCommand
+                        ByteArray(0), // Empty pledge condition for asset transfer
+                        null,
                         issuer, // @property issuer
                         observers // @property observers
                     )
@@ -208,6 +212,7 @@ class AssetTransferSDK {
                         numUnits, // @property assetIdOrQuantity
                         pledgerCert, // @property pledgerCert
                         recipientCert, // @property recipientCert
+                        ByteArray(0), // Empty pledge condition for asset transfer
                         issuer, // @property issuer
                         observers // @property observers
                     )
@@ -255,6 +260,7 @@ class AssetTransferSDK {
                         assetId, // @property assetIdOrQuantity
                         pledgerCert, // @property pledgerCert
                         recipientCert, // @property recipientCert
+                        ByteArray(0), // Empty pledge condition for asset transfer
                         issuer, // @property issuer
                         observers // @property observers
                     )
