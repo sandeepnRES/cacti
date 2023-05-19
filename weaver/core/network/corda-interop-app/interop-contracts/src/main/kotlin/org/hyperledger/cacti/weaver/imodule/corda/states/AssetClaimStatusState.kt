@@ -49,6 +49,7 @@ data class AssetClaimStatusState(
     val claimStatus: Boolean,
     val expiryTimeSecs: Long,
     val expirationStatus: Boolean,
+    val pledgeCondition: ByteArray,
     override val linearId: UniqueIdentifier = UniqueIdentifier()
 ) : LinearState {
     // locker/pledger is not a participant as that party may not be part of the importing network

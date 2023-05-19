@@ -44,6 +44,7 @@ data class AssetPledgeState(
     val expiryTimeSecs: Long,
     val localNetworkId: String,
     val remoteNetworkId: String,
+    val pledgeCondition: ByteArray,
     override val linearId: UniqueIdentifier = UniqueIdentifier(assetStatePointer.hashCode().toString())
 ) : LinearState {
     // recipient is not a participant as that party may not be part of the exporting network
@@ -64,6 +65,7 @@ data class AssetPledgeParameters(
     var expiryTimeSecs: Long,
     var getAssetStateAndRefFlow: String,
     var deleteAssetStateCommand: CommandData,
+    val pledgeCondition: ByteArray,
     var issuer: Party,
     var observers: List<Party>
 )
@@ -78,6 +80,7 @@ data class AssetClaimParameters(
     val assetIdOrQuantity: Any,
     val pledgerCert: String,
     val recipientCert: String,
+    val pledgeCondition: ByteArray,
     val issuer: Party,
     val observers: List<Party>
 )

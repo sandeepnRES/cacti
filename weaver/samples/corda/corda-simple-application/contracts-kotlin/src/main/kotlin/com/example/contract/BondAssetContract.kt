@@ -7,11 +7,22 @@
 package com.cordaSimpleApplication.contract
 
 import com.cordaSimpleApplication.state.BondAssetState
+import com.cordaSimpleApplication.state.BondAssetStateJSON
+import com.cordaSimpleApplication.state.LoanRepaymentCondition
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
+import com.google.gson.Gson
+import com.google.protobuf.ByteString
+
+import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetClaimStatusState
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetExchangeHTLCState
+import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
+import org.hyperledger.cacti.weaver.imodule.corda.contracts.parseExternalStateForPledgeStatus
 
 /**
  * An implementation of a sample bond (non-fungible) asset in Corda.
@@ -65,6 +76,67 @@ class BondAssetContract : Contract {
                 val requiredSigners = listOf(inputState.owner.owningKey, outputState.owner.owningKey)
                 "The owners of the input and output assets must be the signers." using (command.signers.containsAll(requiredSigners))
             }
+            is BondAssetContract.Commands.LoanPledge -> requireThat {
+                // Generic constraints around the transaction that transfers ownership of an asset from one Party to other Party
+                val assetStates = tx.inputsOfType<BondAssetState>()
+                val htlcStates = tx.inputsOfType<AssetExchangeHTLCState>()
+                "There should be either BondAssetState or HTLC State as input." using (assetStates.size == 1 || htlcStates.size == 1)
+                "There should be one output AssetPledgeState." using (tx.outputsOfType<AssetPledgeState>().size == 1)
+                
+                val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer.resolve(tx).state.data as BondAssetState
+                val pledgeState = tx.outputsOfType<AssetPledgeState>()[0]
+                val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                
+                "Pledge asset should be same as in pledge condition." using (assetState.id == pledgeCondition.assetId
+                    && assetState.type == pledgeCondition.assetType
+                )
+                
+                "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.lenderCert)
+                "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.borrowerCert)
+                
+                val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                "There should be a single reference input network id." using (inReferences.size == 1)
+
+                val validNetworkIdState = inReferences.get(0).state.data
+                "Asset ledger should be correct in pledge condition." using (pledgeCondition.assetLedgerId.equals(validNetworkIdState.networkId))
+            }
+            is BondAssetContract.Commands.LoanClaim -> requireThat {
+                // Generic constraints around the transaction that transfers ownership of an asset from one Party to other Party
+                "There should be one input AssetPledgeState." using (tx.inputsOfType<AssetPledgeState>().size == 1)
+                "One output state only should be created." using (tx.outputsOfType<BondAssetState>().size == 1)
+                val pledgeState = tx.inputsOfType<AssetPledgeState>()[0]
+                val assetState = tx.outputsOfType<BondAssetState>()[0]
+                val remotePledgeStatus = parseExternalStateForPledgeStatus(
+                    tx.inputsOfType<ExternalState>()[0]
+                )
+                
+                /*
+                * - if repayment amount is correct
+                * - repayment is for correct asset id
+                * - output loaned asset state is same as the one in input pledge state
+                * - output loaned asset state is same as asset in claim status
+                */
+                
+                val assetPledged = pledgeState.assetStatePointer!!.resolve(tx).state.data as BondAssetState
+                
+                "Asset pledged and output asset should be same" using (assetState.id == assetPledged.id
+                    && assetState.type == assetPledged.type
+                    && assetState.linearId == assetPledged.linearId
+                )
+                
+                val claimState = tx.outputsOfType<AssetClaimStatusState>()[0]
+                val marshalledAsset = Gson().fromJson(claimState.assetDetails, BondAssetStateJSON::class.java)
+                
+                "Asset claimed and output asset should be same" using (assetState.id == marshalledAsset.id
+                    && assetState.type == marshalledAsset.type
+                )
+                
+                // Here assuming that when pledges were created 
+                // it was verified that correct asset is present in pledgeCondition
+                val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                val counterPledgeCondition = Gson().fromJson(remotePledgeStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+                "Pledge condition on both pledges should match" using (pledgeCondition == counterPledgeCondition)
+            }
         }
     }
 
@@ -75,5 +147,7 @@ class BondAssetContract : Contract {
         class Issue : Commands
         class Delete : Commands
         class Transfer : Commands
+        class LoanPledge: Commands
+        class LoanClaim: Commands
     }
 }

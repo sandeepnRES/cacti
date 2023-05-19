@@ -77,6 +77,7 @@ object PledgeAsset {
         val recipientCert: String,
         val localNetworkId: String,
         val remoteNetworkId: String,
+        val pledgeCondition: ByteArray,
         val issuer: Party,
         val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, UniqueIdentifier>>() {
@@ -102,7 +103,8 @@ object PledgeAsset {
                 recipientCert,
                 expiryTimeSecs,
                 localNetworkId,
-                remoteNetworkId
+                remoteNetworkId,
+                pledgeCondition
             )
             println("Creating asset pledge state: ${assetPledgeState}")
 
@@ -312,7 +314,8 @@ class GetAssetClaimStatusState(
                 "", // @property recipientCert
                 false, // @property claimStatus
                 expiryTimeSecs,
-                expirationStatus
+                expirationStatus,
+                byteArrayOf()
             )
             println("Creating a dummy [AssetClaimStatusState] state: $assetClaimStatusState")
             return subFlow(AssetClaimStatusStateToProtoBytes(assetClaimStatusState))
@@ -349,6 +352,7 @@ class AssetClaimStatusStateToProtoBytes(
             .setClaimStatus(assetClaimStatusState.claimStatus)
             .setExpiryTimeSecs(assetClaimStatusState.expiryTimeSecs)
             .setExpirationStatus(assetClaimStatusState.expirationStatus)
+            .setPledgeCondition(ByteString.copyFrom(assetClaimStatusState.pledgeCondition))
             .build()
         return Base64.getEncoder().encodeToString(claimStatus.toByteArray()).toByteArray()
     }
@@ -393,7 +397,8 @@ class GetAssetPledgeStatus(
                 "", // @property recipientCert
                 currentTimeSecs, // @property expiryTimeSecs
                 fetchedNetworkIdState.networkId, // @property localNetworkId
-                recipientNetworkId  // @property remoteNetworkId
+                recipientNetworkId,  // @property remoteNetworkId
+                byteArrayOf()
             )
             println("Creating [AssetPledgeState] state: $assetPledgeState.")
             return assetPledgeState
@@ -436,6 +441,7 @@ class AssetPledgeStateToProtoBytes(
             .setRemoteNetworkID(assetPledgeState.remoteNetworkId)
             .setRecipient(assetPledgeState.recipientCert)
             .setExpiryTimeSecs(assetPledgeState.expiryTimeSecs)
+            .setPledgeCondition(ByteString.copyFrom(assetPledgeState.pledgeCondition))
             .build()
         return Base64.getEncoder().encodeToString(pledgeState.toByteArray()).toByteArray()
     }
@@ -714,7 +720,8 @@ object ClaimRemoteAsset {
                 recipientCert,
                 true, // @property claimStatus
                 assetPledgeStatus.expiryTimeSecs, // @property expiryTimeSecs
-                false // @property expirationStatus
+                false, // @property expirationStatus
+                assetPledgeStatus.pledgeCondition.toByteArray()
             )
 
             // Obtain a reference from a notary we wish to use.

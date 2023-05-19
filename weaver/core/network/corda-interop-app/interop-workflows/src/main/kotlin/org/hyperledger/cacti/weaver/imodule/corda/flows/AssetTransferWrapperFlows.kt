@@ -106,6 +106,7 @@ constructor(
                 pledgeArgs.recipientCert,
                 pledgeArgs.localNetworkId,
                 pledgeArgs.remoteNetworkId,
+                pledgeArgs.pledgeCondition,
                 pledgeArgs.issuer,
                 pledgeArgs.observers
             ))
