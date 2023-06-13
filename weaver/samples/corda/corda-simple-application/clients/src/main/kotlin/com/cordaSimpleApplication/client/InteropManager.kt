@@ -55,7 +55,7 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
                 localRelayAddress, 
                 externalStateAddress,
                 networkName,
-                listOf<Party>()
+                listOf<Party>(),
                 config["RELAY_TLS"]!!.toBoolean(),
                 config["RELAY_TLSCA_TRUST_STORE"]!!,
                 config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
