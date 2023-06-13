@@ -144,6 +144,12 @@ fun main(args: Array<String>) = App()
             NetworkIdCommand().subcommands(
                 CreateNetworkIdStateCommand(),
                 RetrieveNetworkIdStateAndRefCommand()
+            ),
+            AssetLoanManager.LoanCommand().subcommands(
+                AssetLoanManager.ClaimAndPledgeCommand(),
+                AssetLoanManager.PledgeTokensCommand(),
+                AssetLoanManager.LoanClaimAssetCommand(),
+                AssetLoanManager.LoanClaimRepaymentCommand()
             )
         )
         .main(args)
