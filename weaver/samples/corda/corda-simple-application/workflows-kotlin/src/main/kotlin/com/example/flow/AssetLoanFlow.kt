@@ -184,16 +184,9 @@ constructor(
                     .addInputState(inputState)
                     .addOutputState(assetPledgeState, AssetTransferContract.ID)
                     .addCommand(assetHTLCClaimCmd)
-                    .addCommand(assetLoanPledgeCmd).apply {
-                        networkIdStateRef.let {
-                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-                        }
-                    }
-                    .addCommand(pledgeCmd).apply {
-                        networkIdStateRef.let {
-                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-                        }
-                    }
+                    .addCommand(assetLoanPledgeCmd)
+                    .addCommand(pledgeCmd)
+                    .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
                     .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
                 
                 // Verify and collect signatures on the transaction
@@ -386,11 +379,8 @@ constructor(
             .addInputState(remotePledgeRef)
             .addOutputState(claimAssetState, BondAssetContract.ID)
             .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
-            .addCommand(claimCmd).apply {
-                networkIdStateRef.let {
-                    this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-                }
-            }
+            .addCommand(claimCmd)
+            .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
             .addCommand(assetCreateCmd)
             .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
         
@@ -595,11 +585,8 @@ constructor(
             .addInputState(remoteClaimStatusRef)
             .addOutputState(claimAssetState, BondAssetContract.ID)
             .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
-            .addCommand(claimCmd).apply {
-                networkIdStateRef.let {
-                    this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-                }
-            }
+            .addCommand(claimCmd)
+            .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
             .addCommand(assetCreateCmd)
             .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
         
