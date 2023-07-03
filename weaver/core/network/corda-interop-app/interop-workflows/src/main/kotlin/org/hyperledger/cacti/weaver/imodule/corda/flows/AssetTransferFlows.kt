@@ -183,8 +183,9 @@ object PledgeAsset {
                     println("Issuer signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing unlock asset transaction by Issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing unlock asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
@@ -606,8 +607,9 @@ object ReclaimPledgedAsset {
                     println("Issuer signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing reclaim asset transaction by Issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing reclaim asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == AssetTransferResponderRole.PLEDGER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
@@ -623,8 +625,9 @@ object ReclaimPledgedAsset {
                     println("Locker signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing reclaim asset transaction by Locker: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing reclaim asset transaction by Locker: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
@@ -862,8 +865,9 @@ object ClaimRemoteAsset {
                     println("Party: ${ourIdentity} signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing claim asset transaction by issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing claim asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
