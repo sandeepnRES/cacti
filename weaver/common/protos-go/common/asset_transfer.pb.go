@@ -24,6 +24,110 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type TxType int32
+
+const (
+	TxType_MINT   TxType = 0
+	TxType_UPDATE TxType = 1
+	TxType_BURN   TxType = 2
+)
+
+// Enum value maps for TxType.
+var (
+	TxType_name = map[int32]string{
+		0: "MINT",
+		1: "UPDATE",
+		2: "BURN",
+	}
+	TxType_value = map[string]int32{
+		"MINT":   0,
+		"UPDATE": 1,
+		"BURN":   2,
+	}
+)
+
+func (x TxType) Enum() *TxType {
+	p := new(TxType)
+	*p = x
+	return p
+}
+
+func (x TxType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TxType) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_asset_transfer_proto_enumTypes[0].Descriptor()
+}
+
+func (TxType) Type() protoreflect.EnumType {
+	return &file_common_asset_transfer_proto_enumTypes[0]
+}
+
+func (x TxType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TxType.Descriptor instead.
+func (TxType) EnumDescriptor() ([]byte, []int) {
+	return file_common_asset_transfer_proto_rawDescGZIP(), []int{0}
+}
+
+type PledgeCondition struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TxType    TxType `protobuf:"varint,1,opt,name=txType,proto3,enum=common.asset_transfer.TxType" json:"txType,omitempty"`
+	Condition []byte `protobuf:"bytes,2,opt,name=condition,proto3" json:"condition,omitempty"`
+}
+
+func (x *PledgeCondition) Reset() {
+	*x = PledgeCondition{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_asset_transfer_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PledgeCondition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PledgeCondition) ProtoMessage() {}
+
+func (x *PledgeCondition) ProtoReflect() protoreflect.Message {
+	mi := &file_common_asset_transfer_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PledgeCondition.ProtoReflect.Descriptor instead.
+func (*PledgeCondition) Descriptor() ([]byte, []int) {
+	return file_common_asset_transfer_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *PledgeCondition) GetTxType() TxType {
+	if x != nil {
+		return x.TxType
+	}
+	return TxType_MINT
+}
+
+func (x *PledgeCondition) GetCondition() []byte {
+	if x != nil {
+		return x.Condition
+	}
+	return nil
+}
+
 type AssetPledge struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -34,12 +138,13 @@ type AssetPledge struct {
 	RemoteNetworkID string `protobuf:"bytes,3,opt,name=remoteNetworkID,proto3" json:"remoteNetworkID,omitempty"`
 	Recipient       string `protobuf:"bytes,4,opt,name=recipient,proto3" json:"recipient,omitempty"`
 	ExpiryTimeSecs  uint64 `protobuf:"varint,5,opt,name=expiryTimeSecs,proto3" json:"expiryTimeSecs,omitempty"`
+	PledgeCondition []byte `protobuf:"bytes,6,opt,name=pledgeCondition,proto3" json:"pledgeCondition,omitempty"`
 }
 
 func (x *AssetPledge) Reset() {
 	*x = AssetPledge{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_asset_transfer_proto_msgTypes[0]
+		mi := &file_common_asset_transfer_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -52,7 +157,7 @@ func (x *AssetPledge) String() string {
 func (*AssetPledge) ProtoMessage() {}
 
 func (x *AssetPledge) ProtoReflect() protoreflect.Message {
-	mi := &file_common_asset_transfer_proto_msgTypes[0]
+	mi := &file_common_asset_transfer_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -65,7 +170,7 @@ func (x *AssetPledge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetPledge.ProtoReflect.Descriptor instead.
 func (*AssetPledge) Descriptor() ([]byte, []int) {
-	return file_common_asset_transfer_proto_rawDescGZIP(), []int{0}
+	return file_common_asset_transfer_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AssetPledge) GetAssetDetails() []byte {
@@ -103,6 +208,13 @@ func (x *AssetPledge) GetExpiryTimeSecs() uint64 {
 	return 0
 }
 
+func (x *AssetPledge) GetPledgeCondition() []byte {
+	if x != nil {
+		return x.PledgeCondition
+	}
+	return nil
+}
+
 type AssetClaimStatus struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -115,12 +227,13 @@ type AssetClaimStatus struct {
 	ClaimStatus      bool   `protobuf:"varint,5,opt,name=claimStatus,proto3" json:"claimStatus,omitempty"`
 	ExpiryTimeSecs   uint64 `protobuf:"varint,6,opt,name=expiryTimeSecs,proto3" json:"expiryTimeSecs,omitempty"`
 	ExpirationStatus bool   `protobuf:"varint,7,opt,name=expirationStatus,proto3" json:"expirationStatus,omitempty"`
+	PledgeCondition  []byte `protobuf:"bytes,8,opt,name=pledgeCondition,proto3" json:"pledgeCondition,omitempty"`
 }
 
 func (x *AssetClaimStatus) Reset() {
 	*x = AssetClaimStatus{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_asset_transfer_proto_msgTypes[1]
+		mi := &file_common_asset_transfer_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -133,7 +246,7 @@ func (x *AssetClaimStatus) String() string {
 func (*AssetClaimStatus) ProtoMessage() {}
 
 func (x *AssetClaimStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_common_asset_transfer_proto_msgTypes[1]
+	mi := &file_common_asset_transfer_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -146,7 +259,7 @@ func (x *AssetClaimStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssetClaimStatus.ProtoReflect.Descriptor instead.
 func (*AssetClaimStatus) Descriptor() ([]byte, []int) {
-	return file_common_asset_transfer_proto_rawDescGZIP(), []int{1}
+	return file_common_asset_transfer_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AssetClaimStatus) GetAssetDetails() []byte {
@@ -196,6 +309,13 @@ func (x *AssetClaimStatus) GetExpirationStatus() bool {
 		return x.ExpirationStatus
 	}
 	return false
+}
+
+func (x *AssetClaimStatus) GetPledgeCondition() []byte {
+	if x != nil {
+		return x.PledgeCondition
+	}
+	return nil
 }
 
 var File_common_asset_transfer_proto protoreflect.FileDescriptor
@@ -258,17 +378,21 @@ func file_common_asset_transfer_proto_rawDescGZIP() []byte {
 	return file_common_asset_transfer_proto_rawDescData
 }
 
-var file_common_asset_transfer_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_common_asset_transfer_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_common_asset_transfer_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_common_asset_transfer_proto_goTypes = []interface{}{
-	(*AssetPledge)(nil),      // 0: common.asset_transfer.AssetPledge
-	(*AssetClaimStatus)(nil), // 1: common.asset_transfer.AssetClaimStatus
+	(TxType)(0),              // 0: common.asset_transfer.TxType
+	(*PledgeCondition)(nil),  // 1: common.asset_transfer.PledgeCondition
+	(*AssetPledge)(nil),      // 2: common.asset_transfer.AssetPledge
+	(*AssetClaimStatus)(nil), // 3: common.asset_transfer.AssetClaimStatus
 }
 var file_common_asset_transfer_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: common.asset_transfer.PledgeCondition.txType:type_name -> common.asset_transfer.TxType
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_common_asset_transfer_proto_init() }
@@ -278,7 +402,7 @@ func file_common_asset_transfer_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_common_asset_transfer_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AssetPledge); i {
+			switch v := v.(*PledgeCondition); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -290,6 +414,18 @@ func file_common_asset_transfer_proto_init() {
 			}
 		}
 		file_common_asset_transfer_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AssetPledge); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_common_asset_transfer_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AssetClaimStatus); i {
 			case 0:
 				return &v.state
@@ -307,13 +443,14 @@ func file_common_asset_transfer_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_common_asset_transfer_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_common_asset_transfer_proto_goTypes,
 		DependencyIndexes: file_common_asset_transfer_proto_depIdxs,
+		EnumInfos:         file_common_asset_transfer_proto_enumTypes,
 		MessageInfos:      file_common_asset_transfer_proto_msgTypes,
 	}.Build()
 	File_common_asset_transfer_proto = out.File

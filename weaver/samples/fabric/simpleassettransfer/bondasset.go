@@ -190,7 +190,7 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	// Pledge the asset using common (library) logic
-	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, remoteNetworkId, recipientCert, expiryTimeSecs, []byte{}); err == nil {
 		// Delete asset state using app-specific logic
 		err = s.DeleteAsset(ctx, assetType, id)
 		if err != nil {

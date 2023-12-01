@@ -228,7 +228,7 @@ func unmarshalAssetClaimStatus(claimStatusBase64 string) (*common.AssetClaimStat
 }
 
 // PledgeAsset locks an asset for transfer to a different ledger/network.
-func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, assetIdOrQuantity, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
+func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, assetIdOrQuantity, remoteNetworkId, recipientCert string, expiryTimeSecs uint64, pledgeCondition []byte) (string, error) {
 	if assetIdOrQuantity == "" {
 		return "", fmt.Errorf("no asset ID or unit count provided")
 	}
@@ -275,6 +275,7 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 		RemoteNetworkID: remoteNetworkId,
 		Recipient: recipientCert,
 		ExpiryTimeSecs: expiryTimeSecs,
+		PledgeCondition: pledgeCondition,
 	}
 	pledgeBytes, err = proto.Marshal(pledge)
 	if err != nil {
@@ -334,6 +335,7 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, rem
 		ClaimStatus: true,
 		ExpiryTimeSecs: pledge.ExpiryTimeSecs,
 		ExpirationStatus: false,
+		PledgeCondition: pledge.PledgeCondition,
 	}
 	claimBytes, err := proto.Marshal(claimStatus)
 	if err != nil {

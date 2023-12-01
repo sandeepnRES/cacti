@@ -1,0 +1,29 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleasset_loan:GetAssetPledgeStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleasset_loan:GetAssetLoanClaimStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleasset_loan:GetTokenAssetPledgeStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleasset_loan:GetTokenAssetClaimStatus:*",
+      "read": true
+    }
+  ]
+}
