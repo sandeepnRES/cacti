@@ -26,5 +26,23 @@
       "args": ["<pledge-id>", "<recipient>", "network2", ""],
       "replaceIndices": [3]
     }
+  },
+  "simpleasset_loan": {
+    "ClaimLoanedAsset": {
+      "args": ["<pledge-id>", "token-network", ""],
+      "replaceIndices": [2]
+    },
+    "ReclaimAsset": {
+      "args": ["<pledge-id>", "<recipient>", "network2", ""],
+      "replaceIndices": [3]
+    },
+    "ClaimLoanRepayment": {
+      "args": ["<pledge-id>", "asset-network", ""],
+      "replaceIndices": [2]
+    },
+    "ReclaimTokenAsset": {
+      "args": ["<pledge-id>", "<recipient>", "asset-network", ""],
+      "replaceIndices": [3]
+    }
   }
 }

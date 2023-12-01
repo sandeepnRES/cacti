@@ -1,0 +1,33 @@
+{
+    "securityDomain": "<network-id>",
+    "identifiers": [
+      {
+        "pattern": "mychannel:simpleasset_loan:GetAssetPledgeStatus:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset_loan:GetAssetLoanClaimStatus:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset_loan:GetTokenAssetPledgeStatus:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset_loan:GetTokenAssetClaimStatus:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      }
+    ]
+}
