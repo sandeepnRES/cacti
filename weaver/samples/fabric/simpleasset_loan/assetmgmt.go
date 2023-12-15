@@ -13,6 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
 )
@@ -166,7 +167,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 	if claimed {
 		// Change asset ownership to claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -205,7 +206,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 	}
 	if claimed {
 		// Change asset ownership to claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -256,7 +257,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	}
 	if claimed {
 		// Add the claimed tokens into the wallet of the claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -342,7 +343,7 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 	}
 	if unlocked {
 		// Add the unlocked tokens into the wallet of the locker
-		lockerECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		lockerECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}

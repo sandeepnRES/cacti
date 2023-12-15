@@ -6,6 +6,7 @@ import (
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 // SmartContract provides functions for managing an BondAsset and TokenAsset
@@ -13,7 +14,11 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
-func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string) error {
+func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType, localNetworkId string) error {
+	err := ctx.GetStub().PutState(wutils.GetLocalNetworkIDKey(), []byte(localNetworkId))
+	if err != nil {
+		return err
+	}
 	if ccType == "Bond" {
 		return s.InitBondAssetLedger(ctx)
 	} else if ccType == "Token" {
