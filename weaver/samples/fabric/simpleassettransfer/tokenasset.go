@@ -220,7 +220,7 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Pledge the asset using common (library) logic
-	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, strconv.Itoa(int(numUnits)), remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, strconv.Itoa(int(numUnits)), remoteNetworkId, recipientCert, expiryTimeSecs, []bytes{}); err == nil {
 		// Deduce asset balance using app-specific logic
 		return pledgeId, s.DeleteTokenAssets(ctx, assetType, numUnits)
 	} else {
