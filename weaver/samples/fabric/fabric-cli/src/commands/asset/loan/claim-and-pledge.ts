@@ -133,7 +133,6 @@ const command: GluegunCommand = {
       print.error('--loan-amount needs to be specified')
       return
     }
-    }
     if (isNaN(options['loan-amount']))
     {
       print.error('--loan-amount must be an integer')

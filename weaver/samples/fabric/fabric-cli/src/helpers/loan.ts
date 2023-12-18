@@ -225,3 +225,9 @@ const getLoanRepaymentCondition = async ({
         throw new Error(error)
     }
 }
+
+export {
+    claimAndPledgeAsset,
+    pledgeTokens,
+    getLoanRepaymentCondition
+}
