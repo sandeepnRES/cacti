@@ -21,7 +21,7 @@ import {
     fabricHelper,
     getUserCertBase64
 } from '../../../helpers/fabric-functions'
-
+import { getLoanRepaymentCondition } from '../../../helpers/loan'
 import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
@@ -174,7 +174,7 @@ const command: GluegunCommand = {
       console.log(loanRepaymentCondition.assetId)
       
       const viewAddress = getClaimStatusViewAddress(transferCategory, "", "",
-        options['asset-pledge-id'], "", "", ""
+        options['asset-pledge-id'], "", "", "", "", ""
       )
       
       const applicationFunction = 'ClaimLoanRepayment'

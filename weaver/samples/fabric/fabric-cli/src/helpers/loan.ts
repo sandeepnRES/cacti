@@ -8,6 +8,7 @@ import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
 import { getKeyAndCertForRemoteRequestbyUserName, fabricHelper, invoke, query, InvocationSpec } from './fabric-functions'
+import { getNetworkConfig, getUserCertFromFile } from './helpers'
 import { AssetPledge } from "@hyperledger/cacti-weaver-protos-js/common/asset_transfer_pb"
 import { AssetManager, HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric"
 import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
@@ -73,8 +74,8 @@ const claimAndPledgeAsset = async ({
     	tokenLedgerLenderCert: lenderTokenCert,
     	tokenLedgerBorrowerCert: borrowerTokenCert,
     	assetType: "",
-    	assetId: "".
-    	assetLedgerId: "".
+    	assetId: "",
+    	assetLedgerId: "",
     	assetLedgerLenderCert: "",
     	assetLedgerBorrowerCertsuer: ""
     }
@@ -133,7 +134,7 @@ const pledgeTokens = async ({
     mspId?: string
     logger?: any
 }): Promise<any> => {
-    const claimInfo64 = AssetManager.createAssetClaimInfoSerialized(hash)
+    //const claimInfo64 = AssetManager.createAssetClaimInfoSerialized(hash)
     const { gateway, contract, wallet } = await fabricHelper({
         channel: channelName,
         contractName: contractName,
@@ -155,10 +156,10 @@ const pledgeTokens = async ({
     	tokenLedgerLenderCert: "",
     	tokenLedgerBorrowerCert: "",
     	assetType: loanedAssetType,
-    	assetId: loanedAssetId.
+    	assetId: loanedAssetId,
     	assetLedgerId: assetNetworkName,
-    	assetLedgerLenderCert: lenderTokenCert,
-    	assetLedgerBorrowerCertsuer: borrowerTokenCert
+    	assetLedgerLenderCert: lenderAssetCert,
+    	assetLedgerBorrowerCertsuer: borrowerAssetCert
     }
     const loanRepaymentConditionJSONStr = JSON.stringify(loanRepaymentConditionJSON)
 

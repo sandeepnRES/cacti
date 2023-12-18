@@ -9,6 +9,7 @@ import * as path from 'path'
 import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
 import { fabricHelper } from '../../../helpers/fabric-functions'
 import { claimAndPledgeAsset } from '../../../helpers/loan'
+import { AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
@@ -160,7 +161,7 @@ const command: GluegunCommand = {
     const pledgeResult = await claimAndPledgeAsset({
         assetNetworkName: options['asset-network'],
         tokenNetworkName: options['token-network'],
-        contractId: contractId,
+        contractId: options['contract-id'],
         hash: hash,
         lender: options['lender'],
         borrower: options['borrower'],

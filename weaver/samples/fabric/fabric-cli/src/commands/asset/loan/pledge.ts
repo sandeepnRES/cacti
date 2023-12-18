@@ -123,7 +123,7 @@ const command: GluegunCommand = {
       print.error('--type of token needs to be specified')
       return
     }
-    if (!options['amount'] && isNaN(options['amount'])
+    if (!options['amount'] && isNaN(options['amount']))
     {
       print.error('--amount must be an integer')
       return

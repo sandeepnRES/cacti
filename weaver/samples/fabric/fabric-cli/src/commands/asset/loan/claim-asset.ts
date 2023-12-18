@@ -21,6 +21,7 @@ import {
     fabricHelper,
     getUserCertBase64
 } from '../../../helpers/fabric-functions'
+import { getLoanRepaymentCondition } from '../../../helpers/loan'
 
 import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
