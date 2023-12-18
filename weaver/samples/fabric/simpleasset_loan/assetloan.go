@@ -100,7 +100,7 @@ func (s *SmartContract) ClaimAndPledgeAsset(ctx contractapi.TransactionContextIn
 		// Pledge the asset using common (library) logic
 		if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, remoteNetworkId, borrowerECertBase64, loanPeriod, loanRepaymentConditionJSON); err == nil {
 			// Delete asset state using app-specific logic
-			err = s.DeleteAsset(ctx, assetType, id)
+			err = deleteAsset(ctx, assetType, id)
 			if err != nil {
 				return pledgeId, err
 			}

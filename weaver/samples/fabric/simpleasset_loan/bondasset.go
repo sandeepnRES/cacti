@@ -142,6 +142,12 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 	return ctx.GetStub().DelState(assetKey)
 }
 
+// DeleteAsset deletes an given asset from the world state.
+func deleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
+	assetKey := getBondAssetKey(assetType, id)
+	return ctx.GetStub().DelState(assetKey)
+}
+
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
 func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	caller, err := wutils.GetECertOfTxCreatorBase64(ctx)
