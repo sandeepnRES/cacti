@@ -281,7 +281,7 @@ func GetLoanRepaymentCondition(ctx contractapi.TransactionContextInterface, pled
 	if err != nil {
 		return "", err
 	}
-	return pledgeConditionFromAssetLedgerJSON, nil
+	return string(pledgeConditionFromAssetLedgerJSON), nil
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
@@ -305,7 +305,7 @@ func (s *SmartContract) GetAssetLoanClaimStatus(ctx contractapi.TransactionConte
 	
 	_, assetPledgeBytes64, err := wutils.GetAssetPledgeDetails(ctx, pledgeId)
 	pledge := &common.AssetPledge{}
-	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(pledgeBytes64)
+	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(assetPledgeBytes64)
 	if err != nil {
 		return "", err
 	}
@@ -320,7 +320,7 @@ func (s *SmartContract) GetAssetLoanClaimStatus(ctx contractapi.TransactionConte
 	}
 
 	// Fetch asset claim details using common (library) logic
-	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, pledgeId, loanRepaymentCondition.AssetLedgerBorrowerCert, loanRepaymentCondition.AssetLedgerLenderCert, loanRepaymentCondition.AssetLedgerId, pledge.LoanPeriod, blankAssetJSON)
+	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, pledgeId, loanRepaymentCondition.AssetLedgerBorrowerCert, loanRepaymentCondition.AssetLedgerLenderCert, loanRepaymentCondition.AssetLedgerId, pledge.ExpiryTimeSecs, blankAssetJSON)
 	if err != nil {
 		return blankClaimBytes64, err
 	}
