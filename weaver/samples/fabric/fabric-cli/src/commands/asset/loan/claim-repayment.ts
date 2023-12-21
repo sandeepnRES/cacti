@@ -151,21 +151,18 @@ const command: GluegunCommand = {
     }
     
     
-    const netConfig = getNetworkConfig(options['asset-network'])
+    const netConfig = getNetworkConfig(options['token-network'])
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
       print.error(
-        `Please use a valid --asset-network. No valid environment found for ${options['asset-network']} `
+        `Please use a valid --token-network. No valid environment found for ${options['token-network']} `
       )
       return
     }
     const transferCategory = 'bond.fabric'
     
     try {
-      const borrowerCert = await getUserCertBase64(options['asset-network'], options['borrower'])
-      const lenderCert = await getUserCertBase64(options['asset-network'], options['lender'])
-      
       const loanRepaymentCondition = await getLoanRepaymentCondition({
-        sourceNetworkName: options['token-network'],
+        networkName: options['token-network'],
         pledgeId: options['pledge-id'],
         caller: options['lender'],
         logger: logger
@@ -174,16 +171,18 @@ const command: GluegunCommand = {
       console.log(loanRepaymentCondition.assetId)
       
       const viewAddress = getClaimStatusViewAddress(transferCategory, "", "",
-        options['asset-pledge-id'], "", "", "", "", ""
+        options['asset-pledge-id'], "", options["token-network"], "", options["asset-network"], ""
       )
       
       const applicationFunction = 'ClaimLoanRepayment'
       var { args, replaceIndices } = getChaincodeConfig(netConfig.chaincode, applicationFunction)
       args[args.indexOf('<pledge-id>')] = options['pledge-id']
       args[args.indexOf('asset-network')] = options['asset-network']
-      
+
+      options['user'] = options['lender']     
+ 
       await interopHelper(
-        options['asset-network'],
+        options['token-network'],
         viewAddress,
         netConfig.chaincode,
         applicationFunction,

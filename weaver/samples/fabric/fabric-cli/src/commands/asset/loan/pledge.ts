@@ -29,7 +29,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli asset loan pledge-repayment --token-network=network1 --asset-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json\r\nfabric-cli asset loan pledge-repayment --token-network=network1 --asset-network=network2 --recipient=bob --expiry-secs=3600 --type=token --owner=alice --units=50 --data-file=src/data/assets.json',
+        'fabric-cli asset loan pledge-repayment --token-network=network2 --asset-network=network1  --lender=bob --borrower=alice --expiry-secs=1800  --token-type=token1 --amount=110 --loaned-asset-id=a03 --loaned-asset-type=bond01',
         'fabric-cli asset loan pledge-repayment --token-network=<token-network-name> --asset-network=<asset-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> [--owner=<owner-id>] [--ref=<asset-id>] [--units=<number-of-units>] --data-file=<path-to-data-file>>',
         [
           {

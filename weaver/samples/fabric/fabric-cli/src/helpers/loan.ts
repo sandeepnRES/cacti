@@ -139,13 +139,13 @@ const pledgeTokens = async ({
         channel: channelName,
         contractName: contractName,
         connProfilePath: connProfilePath,
-        networkName: assetNetworkName,
+        networkName: tokenNetworkName,
         mspId: mspId,
         userString: borrower,
         registerUser: false
     })
-    const lenderTokenCert = getUserCertFromFile(lender, tokenNetworkName)
     const lenderAssetCert = getUserCertFromFile(lender, assetNetworkName)
+    const lenderTokenCert = getUserCertFromFile(lender, tokenNetworkName)
     const borrowerAssetCert = getUserCertFromFile(borrower, assetNetworkName)
     const expirationTime = (Math.floor(Date.now()/1000 + expiryTimeSecs)).toString()
     
@@ -153,7 +153,7 @@ const pledgeTokens = async ({
         tokenType: "",
         tokenQuantity: "",
     	tokenLedgerId: "",
-    	tokenLedgerLenderCert: "",
+    	tokenLedgerLenderCert: lenderTokenCert,
     	tokenLedgerBorrowerCert: "",
     	assetType: loanedAssetType,
     	assetId: loanedAssetId,
@@ -164,7 +164,7 @@ const pledgeTokens = async ({
     const loanRepaymentConditionJSONStr = JSON.stringify(loanRepaymentConditionJSON)
 
     const ccFunc = 'PledgeRepaymentTokens'
-    const args = [repaymentTokenType, repaymentAmount, assetNetworkName, lenderTokenCert, expirationTime, loanRepaymentConditionJSONStr]
+    const args = [repaymentTokenType, repaymentAmount.toString(), assetNetworkName, expirationTime, loanRepaymentConditionJSONStr]
     console.log(ccFunc)
     console.log(args)
     try {
@@ -186,23 +186,23 @@ const pledgeTokens = async ({
 }
 
 const getLoanRepaymentCondition = async ({
-    sourceNetworkName,
+    networkName,
     pledgeId,
     caller,
     logger
 }: {
-    sourceNetworkName: string
+    networkName: string
     pledgeId: string
     caller: string
     logger?: any
 }): Promise<any> => {
-    const netConfig = getNetworkConfig(sourceNetworkName)
+    const netConfig = getNetworkConfig(networkName)
 
     const currentQuery = {
         channel: netConfig.channelName,
         contractName: netConfig.chaincode
             ? netConfig.chaincode
-            : 'simpleasset',
+            : 'simpleassetloan',
         ccFunc: '',
         args: []
     }
@@ -213,7 +213,7 @@ const getLoanRepaymentCondition = async ({
     try {
         const res = await query(currentQuery,
             netConfig.connProfilePath,
-            sourceNetworkName,
+            networkName,
             netConfig.mspId,
             logger,
             caller,

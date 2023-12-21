@@ -1,0 +1,29 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleassetloan:GetAssetPledgeStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleassetloan:GetAssetLoanClaimStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleassetloan:GetTokenAssetPledgeStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleassetloan:GetTokenAssetClaimStatus:*",
+      "read": true
+    }
+  ]
+}

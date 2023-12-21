@@ -42,7 +42,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli asset loan claim-asset --token-network=network1 --asset-network=network2 --borrower=alice --type=bond --pledge-id="pledgeid" --param=bond01:a03\r\nfabric-cli asset loan claim-asset --token-network=network1 --asset-network=network2 --borrower=alice --type=token --param=token1:50',
+        'fabric-cli asset loan claim-asset --token-network=network2 --asset-network=network1 --borrower=alice --lender=bob --type=bond --pledge-id="<pledgeid>" --token-pledge-id="<token-pledge-id>"',
         'fabric-cli asset loan claim-asset --token-network=<token-network-name> --asset-network=<asset-network-name> --borrower=<borrower-id> --type=<bond|token> --pledge-id=<pledge-id> --param=<asset-type>:<asset-id|num-units>',
         [
           {
@@ -135,9 +135,9 @@ const command: GluegunCommand = {
       print.error('--pledge-id needs to be specified')
       return
     }
-    if (!options['asset-pledge-id'])
+    if (!options['token-pledge-id'])
     {
-      print.error('--pledge-id needs to be specified')
+      print.error('--token-pledge-id needs to be specified')
       return
     }
     
@@ -152,16 +152,16 @@ const command: GluegunCommand = {
     const transferCategory = 'token.fabric'
     
     try {
-      const lenderCert = await getUserCertBase64(options['token-network'], options['lender'])
+      const borrowerCert = await getUserCertBase64(options['asset-network'], options['borrower'])
       const { viewAddress, ownerCert } = await getClaimViewAddress(transferCategory, options['token-pledge-id'],
-        options['borrower'], options['asset-network'], lenderCert, options['token-network']
+        options['borrower'], options['token-network'], borrowerCert, options['asset-network']
       )
       
       const applicationFunction = 'ClaimLoanedAsset'
       var { args, replaceIndices } = getChaincodeConfig(netConfig.chaincode, applicationFunction)
       args[args.indexOf('<pledge-id>')] = options['pledge-id']
       args[args.indexOf('token-network')] = options['token-network']
-      
+      options['user'] = options['borrower'] 
       await interopHelper(
         options['asset-network'],
         viewAddress,
