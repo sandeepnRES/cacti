@@ -92,8 +92,8 @@ dependencies {
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
         kotlinOptions {
-            languageVersion = "1.2"
-            apiVersion = "1.2"
+            languageVersion = "1.4"
+            apiVersion = "1.4"
             jvmTarget = "1.8"
             javaParameters = true   // Useful for reflection.
         }

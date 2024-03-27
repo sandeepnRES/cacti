@@ -3,8 +3,8 @@ buildscript {
 }
 
 plugins {
-    id "maven-publish"
     id "java"
+    id "maven-publish"
     id "idea"
 }
 
@@ -40,7 +40,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Corda dependencies.
-    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
     
@@ -57,7 +57,7 @@ publishing {
             groupId = project.properties['group']
             artifactId = 'interop-contracts'
             version = project.properties['version']
-            from components.java
+            from components.cordapp
         }
     }
     repositories {

@@ -14,7 +14,6 @@ buildscript {
         corda_version = constants.getProperty("cordaVersion")
         corda_core_version = constants.getProperty("cordaVersion")
         arrow_version = constants.getProperty("arrowVersion")
-        corda_gradle_plugins_version = constants.getProperty("gradlePluginsVersion")
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         cacti_version = constants.getProperty("cactiVersion")
@@ -97,8 +96,8 @@ dependencies {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
     kotlinOptions {
-        languageVersion = "1.3"
-        apiVersion = "1.3"
+        languageVersion = "1.4"
+        apiVersion = "1.4"
         jvmTarget = "1.8"
         javaParameters = true
     }
