@@ -1,0 +1,58 @@
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Corda driver gRPC server started. Listening on port 9098
+Request received with request: policy: "PartyA"
+address: "localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H"
+requesting_relay: "Corda_Relay"
+requesting_network: "Corda_Network"
+certificate: "-----BEGIN CERTIFICATE-----\nMIIBzDCCAWegAwIBAgIQbegAkzWcX6OtUTjSxUFqDzAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEA8dXDfPWS+bdtEos6Qfdn3JF+4HPK1awT2ZxDTOatbJqjgYkwgYYwHQYDVR0O\nBBYEFHs332oSTBtWVMUUvbUIlvseMMhFMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFPsSlKzW4bnK\nIvXuCXfQ7DNG4PnGMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSQAwRgIhANlDCcnECJlBJg2/8DMQHzgdmfmpmDRZUN9PrrFwsG/VAiEA\n22e5ScYUlh1GuzU6gdhD9cApoDYRcJNNkx72hf+yYfc=\n-----END CERTIFICATE-----"
+requestor_signature: "z6+b1Nj9/0J63+G9LIFLB6jVJs8neIB7DvurXO5DD7FR/fk3cFqPX4QSR77ENQOBzPAzQUJZRMDeL1VgA0/fAA=="
+nonce: "b0709b3a-9b07-4a59-b3c9-a99fa40a5f58"
+request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+requesting_org: "PartyA"
+
+Fetching state from the Corda network.
+
+Sending back Ack: request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+message: "Received query with request id 06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+
+
+UseHandleExternalRequest Query: policy: "PartyA"
+address: "localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H"
+requesting_relay: "Corda_Relay"
+requesting_network: "Corda_Network"
+certificate: "-----BEGIN CERTIFICATE-----\nMIIBzDCCAWegAwIBAgIQbegAkzWcX6OtUTjSxUFqDzAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEA8dXDfPWS+bdtEos6Qfdn3JF+4HPK1awT2ZxDTOatbJqjgYkwgYYwHQYDVR0O\nBBYEFHs332oSTBtWVMUUvbUIlvseMMhFMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFPsSlKzW4bnK\nIvXuCXfQ7DNG4PnGMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSQAwRgIhANlDCcnECJlBJg2/8DMQHzgdmfmpmDRZUN9PrrFwsG/VAiEA\n22e5ScYUlh1GuzU6gdhD9cApoDYRcJNNkx72hf+yYfc=\n-----END CERTIFICATE-----"
+requestor_signature: "z6+b1Nj9/0J63+G9LIFLB6jVJs8neIB7DvurXO5DD7FR/fk3cFqPX4QSR77ENQOBzPAzQUJZRMDeL1VgA0/fAA=="
+nonce: "b0709b3a-9b07-4a59-b3c9-a99fa40a5f58"
+request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+requesting_org: "PartyA"
+
+Corda node returned: Right(b=meta {
+  protocol: CORDA
+  timestamp: "Wed Apr 03 11:36:07 GMT 2024"
+  proof_type: "Notarization"
+  serialization_format: "JSON"
+}
+data: "\n\340\a\nXcXr2W+0ybX1JMPqeMjf2j8kV+FLxKA9FVZb0TK1JFfv28e3nfn6hNrSKHmstnc1AfeZJ8E2cTOHWhym9M55+AQ==\022\253\005-----BEGIN CERTIFICATE-----\nMIIByzCCAWegAwIBAgIQRpFm6AV5iiyqlbYzaSYdKTAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEAny/nlO4++cTKtX84FvSMMiIhhCP0FTnfE74ZDB2rD96jgYkwgYYwHQYDVR0O\nBBYEFBMga2ymFN2aODB4qnJpPr7tCUrAMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFP2u0aRPecA0\nu9iPLdjjsED4kakYMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSAAwRQIhAPLUoVyWaGHyPXeNYGcNhlmVWoBuRXDBqiNJhqMNuignAiB+\nyH5XnaSOtZiXc2JezzvYaF8QJ6QzPV5K6dA67VD+VA==\n-----END CERTIFICATE-----\032\006PartyA\"\315\001\nl[SimpleState(key=H, value=1, owner=O=PartyA, L=London, C=GB, linearId=451a242f-20cd-42d1-a6b0-3ff2bf6e4393)]\022]localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H"
+)
+
+Aggregating the notarizedPayloads returned from all Corda nodes.
+
+Sending state back to remote relay: request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+view {
+  meta {
+    protocol: CORDA
+    timestamp: "Wed Apr 03 11:36:07 GMT 2024"
+    proof_type: "Notarization"
+    serialization_format: "JSON"
+  }
+  data: "\n\340\a\nXcXr2W+0ybX1JMPqeMjf2j8kV+FLxKA9FVZb0TK1JFfv28e3nfn6hNrSKHmstnc1AfeZJ8E2cTOHWhym9M55+AQ==\022\253\005-----BEGIN CERTIFICATE-----\nMIIByzCCAWegAwIBAgIQRpFm6AV5iiyqlbYzaSYdKTAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEAny/nlO4++cTKtX84FvSMMiIhhCP0FTnfE74ZDB2rD96jgYkwgYYwHQYDVR0O\nBBYEFBMga2ymFN2aODB4qnJpPr7tCUrAMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFP2u0aRPecA0\nu9iPLdjjsED4kakYMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSAAwRQIhAPLUoVyWaGHyPXeNYGcNhlmVWoBuRXDBqiNJhqMNuignAiB+\nyH5XnaSOtZiXc2JezzvYaF8QJ6QzPV5K6dA67VD+VA==\n-----END CERTIFICATE-----\032\006PartyA\"\315\001\nl[SimpleState(key=H, value=1, owner=O=PartyA, L=London, C=GB, linearId=451a242f-20cd-42d1-a6b0-3ff2bf6e4393)]\022]localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H"
+}
+
+
+Sending state back to the relay for request 06a5e496-a422-4adc-a6e7-8059d7d17ae5
+Received from SendDriverState: request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+
+Response back from relay from sendDriverState request: request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+
