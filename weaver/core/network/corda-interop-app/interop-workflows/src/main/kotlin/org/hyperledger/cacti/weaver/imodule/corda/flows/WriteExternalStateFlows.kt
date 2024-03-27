@@ -136,7 +136,9 @@ constructor(
                     println("Error in resolving user flow: ${it.message}")
                     Left(Error("Error in resolving user flow: ${it.message}"))
                 }, {
-                    Right(subFlow(it))
+                    val userFlowResult = subFlow(it)
+                    println("\nuserFlowResult: $userFlowResult")
+                    Right(userFlowResult)
                 })
             }
         } catch (e: Exception) {

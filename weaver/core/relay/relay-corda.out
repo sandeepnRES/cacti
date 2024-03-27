@@ -1,0 +1,130 @@
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/data_transfer_service.rs:266:31
+    |
+266 |     let status = ack::Status::from_i32(ack.status)
+    |                               ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/event_subscribe_service.rs:232:31
+    |
+232 |     let status = ack::Status::from_i32(ack.status)
+    |                               ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/event_publish_service.rs:356:51
+    |
+356 |                         let status = ack::Status::from_i32(ack.status)
+    |                                                   ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::events::event_subscription_state::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/network_service.rs:272:57
+    |
+272 |                 match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
+    |                                                         ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/network_service.rs:607:36
+    |
+607 |                 match ack::Status::from_i32(ack_response_into_inner.status) {
+    |                                    ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/network_service.rs:742:36
+    |
+742 |                 match ack::Status::from_i32(ack_response_into_inner.status) {
+    |                                    ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::events::EventSubOperation::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/event_subscribe_service.rs:258:40
+    |
+258 |     let operation = EventSubOperation::from_i32(event_sub.operation)
+    |                                        ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/event_subscribe_service.rs:345:40
+    |
+345 |                     match ack::Status::from_i32(response_ack.into_inner().status) {
+    |                                        ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::ack::ack::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/event_subscribe_service.rs:383:24
+    |
+383 |     match ack::Status::from_i32(request_ack.status) {
+    |                        ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::events::event_subscription_state::Status::from_i32`: Use the TryFrom<i32> implementation instead
+  --> src/services/helpers.rs:50:57
+   |
+50 |                 match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
+   |                                                         ^^^^^^^^
+
+warning: use of deprecated associated function `weaverpb::common::state::request_state::Status::from_i32`: Use the TryFrom<i32> implementation instead
+   --> src/services/helpers.rs:332:47
+    |
+332 |     let state_status = request_state::Status::from_i32(state.clone().status).expect("No Status");
+    |                                               ^^^^^^^^
+
+warning: `relay` (bin "server") generated 11 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.51s
+     Running `target/debug/server`
+Relay Name: "Corda_Relay"
+RelayServer listening on 127.0.0.1:9081
+Got a NetworkQuery request from Some(127.0.0.1:57734) - Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: NetworkQuery { policy: ["PartyA"], address: "localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H", requesting_relay: "", requesting_network: "Corda_Network", certificate: "-----BEGIN CERTIFICATE-----\nMIIBzDCCAWegAwIBAgIQbegAkzWcX6OtUTjSxUFqDzAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEA8dXDfPWS+bdtEos6Qfdn3JF+4HPK1awT2ZxDTOatbJqjgYkwgYYwHQYDVR0O\nBBYEFHs332oSTBtWVMUUvbUIlvseMMhFMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFPsSlKzW4bnK\nIvXuCXfQ7DNG4PnGMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSQAwRgIhANlDCcnECJlBJg2/8DMQHzgdmfmpmDRZUN9PrrFwsG/VAiEA\n22e5ScYUlh1GuzU6gdhD9cApoDYRcJNNkx72hf+yYfc=\n-----END CERTIFICATE-----", requestor_signature: "z6+b1Nj9/0J63+G9LIFLB6jVJs8neIB7DvurXO5DD7FR/fk3cFqPX4QSR77ENQOBzPAzQUJZRMDeL1VgA0/fAA==", nonce: "b0709b3a-9b07-4a59-b3c9-a99fa40a5f58", requesting_org: "PartyA", confidential: false }, extensions: Extensions }
+Successfully stored NetworkQuery in db with request_id: 06a5e496-a422-4adc-a6e7-8059d7d17ae5
+Address to be parsed: localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+Sending Query to remote relay: "localhost":"9082"
+Sending Ack back to network: Ack { status: Ok, request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5", message: "" }
+
+Query: Request { metadata: MetadataMap { headers: {} }, message: Query { policy: ["PartyA"], address: "localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H", requesting_relay: "Corda_Relay", requesting_network: "Corda_Network", certificate: "-----BEGIN CERTIFICATE-----\nMIIBzDCCAWegAwIBAgIQbegAkzWcX6OtUTjSxUFqDzAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTI0MDQwMzAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEA8dXDfPWS+bdtEos6Qfdn3JF+4HPK1awT2ZxDTOatbJqjgYkwgYYwHQYDVR0O\nBBYEFHs332oSTBtWVMUUvbUIlvseMMhFMA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFPsSlKzW4bnK\nIvXuCXfQ7DNG4PnGMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSQAwRgIhANlDCcnECJlBJg2/8DMQHzgdmfmpmDRZUN9PrrFwsG/VAiEA\n22e5ScYUlh1GuzU6gdhD9cApoDYRcJNNkx72hf+yYfc=\n-----END CERTIFICATE-----", requestor_signature: "z6+b1Nj9/0J63+G9LIFLB6jVJs8neIB7DvurXO5DD7FR/fk3cFqPX4QSR77ENQOBzPAzQUJZRMDeL1VgA0/fAA==", nonce: "b0709b3a-9b07-4a59-b3c9-a99fa40a5f58", request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5", requesting_org: "PartyA", confidential: false }, extensions: Extensions }
+Received Ack from remote relay: Ok(Response { metadata: MetadataMap { headers: {"content-type": "application/grpc", "date": "Wed, 03 Apr 2024 11:36:01 GMT", "grpc-status": "0"} }, message: Ack { status: Ok, request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5", message: "" }, extensions: Extensions })
+
+Successfully written RequestState to database
+RequestState { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5", status: Pending, state: None }
+
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 1
+Received state from remote relay: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5"
+View Meta: Some(Meta { protocol: Corda, timestamp: "Wed Apr 03 11:36:07 GMT 2024", proof_type: "Notarization", serialization_format: "JSON" }), View Data: "CuAHClhjWHIyVysweWJYMUpNUHFlTWpmMmo4a1YrRkx4S0E5RlZaYjBUSzFKRmZ2MjhlM25mbjZoTnJTS0htc3RuYzFBZmVaSjhFMmNUT0hXaHltOU01NStBUT09EqsFLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ5ekNDQVdlZ0F3SUJBZ0lRUnBGbTZBVjVpaXlxbGJZemFTWWRLVEFVQmdncWhrak9QUVFEQWdZSUtvWkkKemowREFRY3dMekVMTUFrR0ExVUVCaE1DUjBJeER6QU5CZ05WQkFjTUJreHZibVJ2YmpFUE1BMEdBMVVFQ2d3RwpVR0Z5ZEhsQk1CNFhEVEkwTURRd016QXdNREF3TUZvWERUSTNNRFV5TURBd01EQXdNRm93THpFTE1Ba0dBMVVFCkJoTUNSMEl4RHpBTkJnTlZCQWNNQmt4dmJtUnZiakVQTUEwR0ExVUVDZ3dHVUdGeWRIbEJNQ293QlFZREsyVncKQXlFQW55L25sTzQrK2NUS3RYODRGdlNNTWlJaGhDUDBGVG5mRTc0WkRCMnJEOTZqZ1lrd2dZWXdIUVlEVlIwTwpCQllFRkJNZ2EyeW1GTjJhT0RCNHFuSnBQcjd0Q1VyQU1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0N3WURWUjBQCkJBUURBZ0tFTUJNR0ExVWRKUVFNTUFvR0NDc0dBUVVGQndNQ01COEdBMVVkSXdRWU1CYUFGUDJ1MGFSUGVjQTAKdTlpUExkampzRUQ0a2FrWU1CRUdDaXNHQVFRQmc0cGlBUUVFQXdJQkJqQVVCZ2dxaGtqT1BRUURBZ1lJS29aSQp6ajBEQVFjRFNBQXdSUUloQVBMVW9WeVdhR0h5UFhlTllHY05obG1WV29CdVJYREJxaU5KaHFNTnVpZ25BaUIrCnlINVhuYVNPdFppWGMySmV6enZZYUY4UUo2UXpQVjVLNmRBNjdWRCtWQT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0aBlBhcnR5QSLNAQpsW1NpbXBsZVN0YXRlKGtleT1ILCB2YWx1ZT0xLCBvd25lcj1PPVBhcnR5QSwgTD1Mb25kb24sIEM9R0IsIGxpbmVhcklkPTQ1MWEyNDJmLTIwY2QtNDJkMS1hNmIwLTNmZjJiZjZlNDM5MyldEl1sb2NhbGhvc3Q6OTA4Mi9Db3JkYV9OZXR3b3JrMi9sb2NhbGhvc3Q6MzAwMDYjY29tLmNvcmRhU2ltcGxlQXBwbGljYXRpb24uZmxvdy5HZXRTdGF0ZUJ5S2V5Okg="
+Stored ViewPayload into db with request_id: 06a5e496-a422-4adc-a6e7-8059d7d17ae5
+Successfully set state in DB.
+Sending back Ack to remote relay: Ok(Response { metadata: MetadataMap { headers: {} }, message: Ack { status: Ok, request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5", message: "" }, extensions: Extensions })
+
+Received GetState request from network: Request { metadata: MetadataMap { headers: {"content-type": "application/grpc", "te": "trailers", "user-agent": "grpc-java-netty/1.29.0", "grpc-accept-encoding": "gzip"} }, message: GetStateMessage { request_id: "06a5e496-a422-4adc-a6e7-8059d7d17ae5" }, extensions: Extensions }
+Sending back RequestState to network: Request ID = "06a5e496-a422-4adc-a6e7-8059d7d17ae5", Status = 3
+View Meta: Some(Meta { protocol: Corda, timestamp: "Wed Apr 03 11:36:07 GMT 2024", proof_type: "Notarization", serialization_format: "JSON" }), View Data: "CuAHClhjWHIyVysweWJYMUpNUHFlTWpmMmo4a1YrRkx4S0E5RlZaYjBUSzFKRmZ2MjhlM25mbjZoTnJTS0htc3RuYzFBZmVaSjhFMmNUT0hXaHltOU01NStBUT09EqsFLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ5ekNDQVdlZ0F3SUJBZ0lRUnBGbTZBVjVpaXlxbGJZemFTWWRLVEFVQmdncWhrak9QUVFEQWdZSUtvWkkKemowREFRY3dMekVMTUFrR0ExVUVCaE1DUjBJeER6QU5CZ05WQkFjTUJreHZibVJ2YmpFUE1BMEdBMVVFQ2d3RwpVR0Z5ZEhsQk1CNFhEVEkwTURRd016QXdNREF3TUZvWERUSTNNRFV5TURBd01EQXdNRm93THpFTE1Ba0dBMVVFCkJoTUNSMEl4RHpBTkJnTlZCQWNNQmt4dmJtUnZiakVQTUEwR0ExVUVDZ3dHVUdGeWRIbEJNQ293QlFZREsyVncKQXlFQW55L25sTzQrK2NUS3RYODRGdlNNTWlJaGhDUDBGVG5mRTc0WkRCMnJEOTZqZ1lrd2dZWXdIUVlEVlIwTwpCQllFRkJNZ2EyeW1GTjJhT0RCNHFuSnBQcjd0Q1VyQU1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0N3WURWUjBQCkJBUURBZ0tFTUJNR0ExVWRKUVFNTUFvR0NDc0dBUVVGQndNQ01COEdBMVVkSXdRWU1CYUFGUDJ1MGFSUGVjQTAKdTlpUExkampzRUQ0a2FrWU1CRUdDaXNHQVFRQmc0cGlBUUVFQXdJQkJqQVVCZ2dxaGtqT1BRUURBZ1lJS29aSQp6ajBEQVFjRFNBQXdSUUloQVBMVW9WeVdhR0h5UFhlTllHY05obG1WV29CdVJYREJxaU5KaHFNTnVpZ25BaUIrCnlINVhuYVNPdFppWGMySmV6enZZYUY4UUo2UXpQVjVLNmRBNjdWRCtWQT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0aBlBhcnR5QSLNAQpsW1NpbXBsZVN0YXRlKGtleT1ILCB2YWx1ZT0xLCBvd25lcj1PPVBhcnR5QSwgTD1Mb25kb24sIEM9R0IsIGxpbmVhcklkPTQ1MWEyNDJmLTIwY2QtNDJkMS1hNmIwLTNmZjJiZjZlNDM5MyldEl1sb2NhbGhvc3Q6OTA4Mi9Db3JkYV9OZXR3b3JrMi9sb2NhbGhvc3Q6MzAwMDYjY29tLmNvcmRhU2ltcGxlQXBwbGljYXRpb24uZmxvdy5HZXRTdGF0ZUJ5S2V5Okg="
