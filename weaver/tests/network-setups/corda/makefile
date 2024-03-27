@@ -95,6 +95,7 @@ rebuild-network2:
 	cd dev/Corda_Network2/build/nodes/PartyB && rm -rf corda.jar djvm logs cordapps/*.jar
 	cd dev/Corda_Network2/build/nodes/PartyC && rm -rf corda.jar djvm logs cordapps/*.jar
 	rm -rf dev/Corda_Network2/build/nodes/.cache
+	rm -rf dev/Corda_Network2/build/kotlin
 	touch dev/Corda_Network2/build/nodes/Notary/cordapps/config/.gitkeep
 	touch dev/Corda_Network2/build/nodes/PartyA/cordapps/config/.gitkeep
 	touch dev/Corda_Network2/build/nodes/PartyB/cordapps/config/.gitkeep
@@ -107,8 +108,19 @@ rebuild-network1:
 	cd dev/Corda_Network/build/nodes/PartyB && rm -rf corda.jar djvm logs cordapps/*.jar
 	cd dev/Corda_Network/build/nodes/PartyC && rm -rf corda.jar djvm logs cordapps/*.jar
 	rm -rf dev/Corda_Network/build/nodes/.cache
+	rm -rf dev/Corda_Network/build/kotlin
 	touch dev/Corda_Network/build/nodes/Notary/cordapps/config/.gitkeep
 	touch dev/Corda_Network/build/nodes/PartyA/cordapps/config/.gitkeep
 	touch dev/Corda_Network/build/nodes/PartyB/cordapps/config/.gitkeep
 	touch dev/Corda_Network/build/nodes/PartyC/cordapps/config/.gitkeep
     
+backup-network1:
+	cp -r dev/Corda_Network/build ./shared/Corda_Network
+
+backup-network2:
+	cp -r dev/Corda_Network2/build ./shared/Corda_Network2
+
+backup: backup-network1 backup-network2
+
+delete-backup:
+	rm -rf ./shared/Corda_Network ./shared/Corda_Network2
