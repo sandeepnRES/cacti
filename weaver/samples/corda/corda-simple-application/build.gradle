@@ -15,22 +15,20 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         cacti_version = constants.getProperty("cactiVersion")  
         tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
-        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
+        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')
+        cliktVersion = constants.getProperty('cliktVersion')
     }
 
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://repo1.maven.org/maven2' }
         maven { url 'https://download.corda.net/maven/corda-releases' }
-        maven { url 'https://download.corda.net/maven/corda-dependencies' }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
-        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
     }
 }
@@ -99,7 +97,6 @@ allprojects {
 }
 
 apply plugin: 'net.corda.plugins.cordapp'
-apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
 
 sourceSets {
