@@ -1,10 +1,10 @@
-2024-03-28 00:34:38.614000+05:30 jdbc[3]: exception
+2024-03-28 18:57:20.162000Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "NODE_CHECKPOINTS" not found (this database is empty); SQL statement:
 select count(*) from node_checkpoints [42104-224]
-2024-03-28 00:35:10.973000+05:30 jdbc[3]: exception
+2024-03-28 18:57:24.399000Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DATABASECHANGELOGLOCK" not found; SQL statement:
 SELECT COUNT(*) FROM PUBLIC.DATABASECHANGELOGLOCK [42102-224]
-2024-03-28 00:35:11.561000+05:30 jdbc[3]: exception
+2024-03-28 18:57:27.409000Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.RELEVANCY_STATUS" not found; SQL statement:
 select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -89,7 +89,7 @@ select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at picocli.CommandLine.parseWithHandlers(CommandLine.java:1526)
 	at net.corda.cliutils.CordaCliWrapperKt.start(CordaCliWrapper.kt:89)
 	at net.corda.node.Corda.main(Corda.kt:13)
-2024-03-28 00:35:11.704000+05:30 jdbc[3]: exception
+2024-03-28 18:57:28.060000Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.CONSUMING_TX_ID" not found; SQL statement:
 select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -174,7 +174,7 @@ select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at picocli.CommandLine.parseWithHandlers(CommandLine.java:1526)
 	at net.corda.cliutils.CordaCliWrapperKt.start(CordaCliWrapper.kt:89)
 	at net.corda.node.Corda.main(Corda.kt:13)
-2024-03-28 00:35:11.965000+05:30 jdbc[3]: exception
+2024-03-28 18:57:29.145000Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.STATE_MACHINE_RUN_ID" not found; SQL statement:
 select t.state_machine_run_id from PUBLIC.node_transactions t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
