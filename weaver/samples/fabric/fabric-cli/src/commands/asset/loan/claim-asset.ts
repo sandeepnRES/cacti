@@ -162,6 +162,7 @@ const command: GluegunCommand = {
       args[args.indexOf('<pledge-id>')] = options['pledge-id']
       args[args.indexOf('token-network')] = options['token-network']
       options['user'] = options['borrower'] 
+      console.time('claimAsset');
       await interopHelper(
         options['asset-network'],
         viewAddress,
@@ -172,6 +173,7 @@ const command: GluegunCommand = {
         options,
         print        
       )
+      console.timeEnd('claimAsset');
       process.exit()
     } catch (error) {
       print.error(`Error Asset Loan Claim: ${error}`)

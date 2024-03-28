@@ -34,5 +34,3 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
-
-replace github.com/hyperledger/cacti/weaver/common/protos-go/v2 => ../../../../../common/protos-go/
