@@ -150,9 +150,11 @@ const command: GluegunCommand = {
     if (options['contract-id']) {
         try {
             spinner.info(`Trying ${asset} Claim with Contract ID: ${contractId}`)
+            console.time('claim');
             const res = await funcToCall(network.contract,
                           contractId,
                           hash)
+            console.timeEnd('claim');
             if (!res) {
                 throw new Error()
             }

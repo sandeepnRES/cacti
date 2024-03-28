@@ -177,6 +177,7 @@ const command: GluegunCommand = {
 
     try {
         spinner.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
+        console.time('lock '+asset);
         const res = await funcToCall(network.contract,
                     params[0],
                     params[1],
@@ -184,6 +185,7 @@ const command: GluegunCommand = {
                     hash,
                     timeout,
                     null)
+        console.timeEnd('lock '+asset);
         if (!res.result) {
             throw new Error()
         }

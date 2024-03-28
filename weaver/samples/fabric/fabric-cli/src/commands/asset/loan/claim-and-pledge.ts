@@ -10,6 +10,8 @@ import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
 import { fabricHelper } from '../../../helpers/fabric-functions'
 import { claimAndPledgeAsset } from '../../../helpers/loan'
 import { AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
+import { EventsManager } from '@hyperledger/cacti-weaver-sdk-fabric'
+import { EventSubscriptionState, EventType } from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
 
 import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
@@ -158,6 +160,7 @@ const command: GluegunCommand = {
     }
     hash.setPreimage(options['secret'])
 
+    console.time('claimAndPledge');
     const pledgeResult = await claimAndPledgeAsset({
         assetNetworkName: options['asset-network'],
         tokenNetworkName: options['token-network'],
@@ -174,10 +177,73 @@ const command: GluegunCommand = {
         mspId: netConfig.mspId,
         logger: logger
     })
+    console.timeEnd('claimAndPledge');
     if (pledgeResult) {
       console.log('Asset pledged with ID', pledgeResult)
     }
+    //await subscribeDelete(options['lender'], options['asset-network'], pledgeResult, netConfig)
   }
+}
+
+async function subscribeDelete(user, networkName, pledgeId, netConfig) {
+    const data = JSON.parse(`{   
+        "event_matcher": {
+            "eventType": 0,
+            "eventClassId": "LoanRepaymentClaimed", 
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simpleasset_loan",
+            "transactionFunc": ""
+        },  
+        "event_publication_spec": {
+            "ccArgs": ["${pledgeId}", ""],
+            "chaincodeId": "simpleasset_loan",
+            "driverId": "network1",
+            "ccFunc": "DeleteLoanPledge",
+            "channelId": "mychannel",
+            "replaceArgIndex": 1
+        },  
+        "view_address": "relay-network2:9083/network2/mychannel:simpleasset_loan:GetLoanClaimStatusBool:?",
+        "confidential": false
+    }`)
+
+    console.log("Subscribing event:")
+    console.log(data)
+
+    const eventMatcher = EventsManager.createEventMatcher(data.event_matcher)
+    const eventPublicationSpec = EventsManager.createEventPublicationSpec(data.event_publication_spec)
+
+    const { gateway, wallet, contract } = await fabricHelper({
+        channel: netConfig.channelName,
+        contractName: process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
+        connProfilePath: netConfig.connProfilePath,
+        networkName,
+        mspId: netConfig.mspId,
+        logger,
+        discoveryEnabled: true,
+        userString: user
+    })
+
+    try {
+        const response = await EventsManager.subscribeRemoteEvent(
+            contract,
+            eventMatcher,
+            eventPublicationSpec,
+            networkName,
+            netConfig.mspId,
+            netConfig.relayEndpoint,
+            { address: data[i].view_address, Sign: true },
+            keyCert
+        )
+
+        if (response.getStatus() == EventSubscriptionState.STATUS.SUBSCRIBED) {
+            console.log("Event Subscription Status Success with requestId:", response.getRequestId(), 'and event matcher:', JSON.stringify(eventMatcher.toObject()))
+        } else {
+            console.log("Unknown error")
+        }
+    } catch(e) {
+        console.log("Error: ", e.toString())
+    }
+
 }
 
 module.exports = command

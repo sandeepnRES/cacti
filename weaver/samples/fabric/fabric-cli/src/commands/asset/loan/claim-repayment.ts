@@ -173,6 +173,7 @@ const command: GluegunCommand = {
 
       options['user'] = options['lender']     
  
+      console.time('claimRepayment');
       await interopHelper(
         options['token-network'],
         viewAddress,
@@ -183,6 +184,7 @@ const command: GluegunCommand = {
         options,
         print        
       )
+      console.timeEnd('claimRepayment');
       process.exit()
     } catch (error) {
       print.error(`Error Asset Loan Claim Repayment: ${error}`)
