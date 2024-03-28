@@ -1,7 +1,3 @@
-buildscript {
-    ext.protobuf_version = "3.11.1"
-}
-
 plugins {
     id "java"
     id "maven-publish"
@@ -46,9 +42,6 @@ dependencies {
     
     // weaver-protos
     implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
-    
-    compile "com.google.protobuf:protobuf-java:$protobuf_version"
-    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
 }
 
 publishing {
