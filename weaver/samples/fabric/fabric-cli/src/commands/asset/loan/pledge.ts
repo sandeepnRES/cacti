@@ -148,6 +148,7 @@ const command: GluegunCommand = {
       return
     }
 
+    console.time('pledge')
     const pledgeResult = await pledgeTokens({
         assetNetworkName: options['asset-network'],
         tokenNetworkName: options['token-network'],
@@ -164,6 +165,7 @@ const command: GluegunCommand = {
         mspId: netConfig.mspId,
         logger: logger
     })
+    console.timeEnd('pledge')
     if (pledgeResult) {
       console.log('Asset pledged with ID', pledgeResult)
     }
