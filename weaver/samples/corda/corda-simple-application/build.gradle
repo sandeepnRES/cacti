@@ -15,22 +15,20 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         cacti_version = constants.getProperty("cactiVersion")  
         tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
-        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
+        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')
+        cliktVersion = constants.getProperty('cliktVersion')
     }
 
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://repo1.maven.org/maven2' }
         maven { url 'https://download.corda.net/maven/corda-releases' }
-        maven { url 'https://download.corda.net/maven/corda-dependencies' }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
-        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
     }
 }
@@ -99,7 +97,6 @@ allprojects {
 }
 
 apply plugin: 'net.corda.plugins.cordapp'
-apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
 
 sourceSets {
@@ -115,26 +112,22 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Corda dependencies.
-    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
-    cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
-    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+    cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaRuntimeOnly "$corda_release_group:corda-node-api:$corda_release_version"
+    cordaRuntimeOnly "$corda_release_group:corda:$corda_release_version"
 
     // CorDapp dependencies.
     cordapp project(":workflows-kotlin")
     cordapp project(":contracts-kotlin")
 
-    cordaCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
-    cordaCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
-    cordaCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+    cordaProvided "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    cordaProvided "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    cordaProvided "org.slf4j:jul-to-slf4j:$slf4j_version"
 }
 
 cordapp {
-    info {
-        name "CorDapp Template"
-        vendor "Corda Open Source"
-        targetPlatformVersion corda_platform_version
-        minimumPlatformVersion corda_platform_version
-    }
+    targetPlatformVersion corda_platform_version
+    minimumPlatformVersion corda_platform_version
 }
 
 dokka {

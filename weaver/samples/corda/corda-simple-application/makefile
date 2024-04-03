@@ -10,7 +10,8 @@ build-local-weaver-dependencies:
 .PHONY: build-local	
 build-local:
 	cd ../fungible-house-token && rm -f github.properties && make build
-	wget -P clients/libs/ https://repo1.maven.org/maven2/com/github/ajalt/clikt/${CLIKT_VERSION}/clikt-${CLIKT_VERSION}.jar && ./gradlew clean installDist jar
+	#wget -P clients/libs/ https://repo1.maven.org/maven2/com/github/ajalt/clikt/${CLIKT_VERSION}/clikt-${CLIKT_VERSION}.jar && 
+	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
 build-refresh-dependencies-local: build-local-weaver-dependencies
