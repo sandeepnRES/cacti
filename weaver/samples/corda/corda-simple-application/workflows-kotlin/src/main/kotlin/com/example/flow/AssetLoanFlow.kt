@@ -135,11 +135,11 @@ constructor(
                 val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())!!
                 val notary = networkIdStateRef.state.notary
                 val borrower = assetExchangeHTLCState.locker
-                /* val pledgeCmd = Command(AssetTransferContract.Commands.Pledge(),
+                val pledgeCmd = Command(AssetTransferContract.Commands.Pledge(),
                     listOf(
                         ourIdentity.owningKey
                     )
-                ) */
+                )
                 val assetLoanPledgeCmd = Command(BondAssetContract.Commands.LoanPledge(),
                     setOf(
                         ourIdentity.owningKey,
@@ -172,7 +172,7 @@ constructor(
                     assetExchangeHTLCState.assetStatePointer, // @property assetStatePointer
                     ourIdentity, // @property locker
                     pledgeCondition.assetLedgerId, // @property locker
-                    pledgeCondition.tokenLedgerBorrowerCert, // @property recipient
+                    pledgeCondition.assetLedgerBorrowerCert, // @property recipient
                     loanPeriodAbs.getEpochSecond(),
                     pledgeCondition.assetLedgerId,
                     pledgeCondition.tokenLedgerId,
@@ -185,6 +185,7 @@ constructor(
                     .addOutputState(assetPledgeState, AssetTransferContract.ID)
                     .addCommand(assetHTLCClaimCmd)
                     .addCommand(assetLoanPledgeCmd)
+                    .addCommand(pledegCmd)
                     .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
                     .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
                 
@@ -342,10 +343,8 @@ constructor(
         val lender = localPledgeRef.state.data.locker
         val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(lender, serviceHub)).toByteArray())
         
-        val remotePledgeStatus = parseExternalStateForPledgeStatus(
-            remotePledgeRef.state.data
-        )
-        val remotePledgeCondition = Gson().fromJson(remotePledgeStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+        val pledgeConditionFromTokenLedger = Gson().fromJson(remotePledge.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+        val pledgeConditionFromAssetLedger = Gson().fromJson(ByteString.copyFrom(localPledgeRef.state.data.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
         
         val claimAssetState = subFlow(UpdateBondAssetOwnerFromPointer(
             localPledgeRef.state.data.assetStatePointer!! as StaticPointer<BondAssetState>
@@ -358,13 +357,16 @@ constructor(
         val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
         val fetchedNetworkIdState = networkIdStateRef!!.state.data
         
-        if (currentTimeSecs >= localPledgeRef.state.data.expiryTimeSecs) {
+        if (pledgeConditionFromAssetLedger != pledgeConditionFromTokenLedger) {
+            println("Repayment condition doesn't match in asset and token pledges")
+            Left(Error("Repayment condition doesn't match in asset and token pledges")) 
+        } else if (currentTimeSecs >= localPledgeRef.state.data.expiryTimeSecs) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as the expiry time has elapsed.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as the expiry time has elapsed."))
-        } else if (remotePledgeCondition.assetLedgerLenderCert != lenderCert) {
+        } else if (pledgeConditionFromTokenLedger.assetLedgerLenderCert != lenderCert) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged to the the lender.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged to the lender."))
-        } else if (remotePledgeCondition.assetLedgerBorrowerCert != borrowerCert) {
+        } else if (pledgeConditionFromTokenLedger.assetLedgerBorrowerCert != borrowerCert) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged by the the borrower.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged by the the borrower."))
         } else if (fetchedNetworkIdState.networkId != remotePledge.remoteNetworkID) {
@@ -484,14 +486,14 @@ class ClaimLoanedAssetAcceptor(val session: FlowSession) : FlowLogic<SignedTrans
                     
                     // Here assuming that when pledges were created 
                     // it was verified that correct asset is present in pledgeCondition
-                    val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
-                    val remotePledgeCondition = Gson().fromJson(remotePledgeStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
-                    "Pledge condition on both pledges should match" using (pledgeCondition == remotePledgeCondition)
+                    val pledgeConditionFromAssetLedger = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                    val pledgeConditionFromTokenLedger = Gson().fromJson(remotePledgeStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+                    "Pledge condition on both pledges should match" using (pledgeConditionFromAssetLedger == pledgeConditionFromTokenLedger)
                     
                     val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
                     val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.recipient!!, serviceHub)).toByteArray())
                     
-                    "Borrower and Lender parties of Asset in pledgeCondition should be correct" using (remotePledgeCondition.assetLedgerLenderCert == lenderCert && remotePledgeCondition.assetLedgerBorrowerCert == borrowerCert)
+                    "Borrower and Lender parties of Asset in pledgeCondition should be correct" using (pledgeConditionFromTokenLedger.assetLedgerLenderCert == lenderCert && pledgeConditionFromTokenLedger.assetLedgerBorrowerCert == borrowerCert)
                 }
             }
             try {
