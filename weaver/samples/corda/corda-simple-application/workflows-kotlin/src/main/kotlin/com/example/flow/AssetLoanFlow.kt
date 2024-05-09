@@ -138,7 +138,8 @@ constructor(
                 val borrower = assetExchangeHTLCState.locker
                 val pledgeCmd = Command(AssetTransferContract.Commands.Pledge(),
                     listOf(
-                        ourIdentity.owningKey
+                        ourIdentity.owningKey,
+                        borrower.owningKey
                     )
                 )
                 val assetLoanPledgeCmd = Command(BondAssetContract.Commands.LoanPledge(),
@@ -172,14 +173,16 @@ constructor(
                 val assetPledgeState = AssetPledgeState(
                     assetExchangeHTLCState.assetStatePointer, // @property assetStatePointer
                     ourIdentity, // @property locker
-                    pledgeCondition.assetLedgerId, // @property locker
-                    pledgeCondition.assetLedgerBorrowerCert, // @property recipient
+                    pledgeCondition.assetLedgerLenderCert, // @property lockerCert
+                    pledgeCondition.assetLedgerBorrowerCert, // @property recipientCert
                     loanPeriodAbs.getEpochSecond(),
                     pledgeCondition.assetLedgerId,
                     pledgeCondition.tokenLedgerId,
                     marshalledPledgeCondition.toByteArray(),
                     borrower
                 )
+
+                val bondAssetContractAttachmentId = serviceHub.cordappProvider.getContractAttachmentID(BondAssetContract.ID)!!
                 
                 val txBuilder = TransactionBuilder(notary)
                     .addInputState(inputState)
@@ -188,12 +191,13 @@ constructor(
                     .addCommand(assetLoanPledgeCmd)
                     .addCommand(pledgeCmd)
                     .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                    .addAttachment(bondAssetContractAttachmentId)
                     .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
                 
                 // Verify and collect signatures on the transaction
                 txBuilder.verify(serviceHub)
                 val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
-                println("Recipient signed transaction.")
+                println("Lender signed transaction.")
 
                 var sessions = listOf<FlowSession>()
 
@@ -244,7 +248,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     "There should be either BondAssetState or HTLC State as input." using (assetStates.size == 1 || htlcStates.size == 1)
                     "There should be one output AssetPledgeState." using (lTx.outputsOfType<AssetPledgeState>().size == 1)
                     
-                    val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer.resolve(lTx).state.data as BondAssetState
+                    val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer!!.resolve(serviceHub).state.data as BondAssetState
                     val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
                     val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
                     
@@ -253,7 +257,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     )
                     
                     "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
-                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerBorrowerCert)
+                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerBorrowerCert)
                     
                     val inReferences = lTx.referenceInputRefsOfType<NetworkIdState>()
                     "There should be a single reference input network id." using (inReferences.size == 1)
@@ -265,7 +269,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
             }
             try {
                 val txId = subFlow(signTransactionFlow).id
-                println("Issuer signed transaction.")
+                println("${ourIdentity} signed transaction.")
                 return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
             } catch (e: Exception) {
                 println("Error signing claim asset transaction by issuer: ${e.message}\n")
@@ -275,13 +279,13 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
             val signTransactionFlow = object : SignTransactionFlow(session) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val lTx = stx.tx.toLedgerTransaction(serviceHub)
-                    val assetStates = lTx.inputsOfType<BondAssetState>()
                     val htlcStates = lTx.inputsOfType<AssetExchangeHTLCState>()
-                    "There should be either BondAssetState or HTLC State as input." using (assetStates.size == 1 || htlcStates.size == 1)
+                    "There should be one HTLC State as input." using (htlcStates.size == 1)
                     "There should be one output AssetPledgeState." using (lTx.outputsOfType<AssetPledgeState>().size == 1)
                     
-                    val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer.resolve(lTx).state.data as BondAssetState
+                    val assetState = htlcStates[0].assetStatePointer.resolve(serviceHub).state.data as BondAssetState
                     val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
+                    println("a7")
                     val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
                     
                     "Pledge asset should be same as in pledge condition." using (assetState.id == pledgeCondition.assetId
@@ -289,20 +293,22 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     )
                     
                     "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
-                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerBorrowerCert)
+                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerBorrowerCert)
                     
+                    println("a8")
                     val inReferences = lTx.referenceInputRefsOfType<NetworkIdState>()
+                    println("a9")
                     "There should be a single reference input network id." using (inReferences.size == 1)
 
                     val validNetworkIdState = inReferences.get(0).state.data
+                    println("a10")
                     "Asset ledger should be correct in pledge condition." using (pledgeCondition.assetLedgerId.equals(validNetworkIdState.networkId))
-                    //"Loan Pledge conditions should be satisified" using (checkLoanPledge(lTx) == true)
-                    val htlcState = lTx.inputsOfType<AssetExchangeHTLCState>()[0]
-                    //val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
-                    val myCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
-                    //val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
                     
-                    "I should be the recipient of pledge" using (htlcState.locker == ourIdentity && pledgeState.recipient == ourIdentity && pledgeState.recipientCert == myCert)
+                    //"Loan Pledge conditions should be satisified" using (checkLoanPledge(lTx) == true)
+                    val myCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
+                    
+                    "I should be the locker of HTLC state" using (htlcStates[0].locker == ourIdentity) 
+                    "I should be the recipient of pledge" using (pledgeState.recipient == ourIdentity && pledgeState.recipientCert == myCert)
                     "I should be the borrower of pledge condition" using (pledgeCondition.assetLedgerBorrowerCert == myCert)
                 }
             }
