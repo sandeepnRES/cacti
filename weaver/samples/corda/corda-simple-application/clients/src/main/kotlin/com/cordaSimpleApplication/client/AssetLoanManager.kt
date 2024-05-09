@@ -133,8 +133,8 @@ object AssetLoanManager {
     
     /**
      * Command to pledge an asset.
-     * transfer pledge-asset --timeout=120 -rnid 'Corda_Network2' -nrid 'Corda_Network2' --recipient='<name of the recipient>' --param=type:id ----> non-fungible
-     * transfer pledge-asset --fungible --timeout=120 -rnid Corda_Network2 --recipient='<name of the recipient>' --param=type:amount ----> fungible
+     * loan pledge-asset --timeout=120 -rnid 'Corda_Network2' -nrid 'Corda_Network2' --recipient='<name of the recipient>' --param=type:id ----> non-fungible
+     * loan pledge-asset --fungible --timeout=120 -rnid Corda_Network2 --recipient='<name of the recipient>' --param=type:amount ----> fungible
      */
     class PledgeTokensCommand : CliktCommand(name="pledge-asset",
             help = "Locks an asset. $ ./clients transfer pledge-asset --fungible --timeout=10 -rnid 'Corda_Network2' --recipient='<name of recipient>' --param=type:amount") {
@@ -320,8 +320,8 @@ object AssetLoanManager {
         val remotePledgeId: String? by option("-rpid", "--remote-pledge-id", help="Pledge id for token pledged state")
         val borrower: String? by option("-b", "--borrower", help="X500 name for borrower Party in this asset ledger")
         val tokenRelayAddress: String? by option ("-tr", "--token-relay", help="This (token) ledger relay address")
-        val assetLedgerType: String? by option("-tlt", "--asset-ledger-type", help="DLT type of remote network: fabric|corda|besu")
-        val assetLedgerId: String? by option("-tlid", "--asset-ledger-id", help="Ledger ID for asset network")
+        val assetLedgerType: String? by option("-alt", "--asset-ledger-type", help="DLT type of remote network: fabric|corda|besu")
+        val assetLedgerId: String? by option("-alid", "--asset-ledger-id", help="Ledger ID for asset network")
         val observer: String? by option("-o", "--observer", help="Party Name for Observer")
         override fun run() = runBlocking {
             if (pledgeId == null ||

@@ -13,12 +13,13 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
 import com.google.gson.annotations.*
+import net.corda.core.serialization.CordaSerializable
 
 /*
 This pledge condition can contain remote network's pledgeId, to avoid
 storing asset id and their owners.
 */
-
+@CordaSerializable
 data class LoanRepaymentCondition(
     val tokenType: String,
     val tokenQuantity: Long,
