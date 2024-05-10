@@ -148,8 +148,8 @@ fun main(args: Array<String>) = App()
             AssetLoanManager.LoanCommand().subcommands(
                 AssetLoanManager.ClaimAndPledgeCommand(),
                 AssetLoanManager.PledgeTokensCommand(),
-                AssetLoanManager.LoanClaimAssetCommand(),
-                AssetLoanManager.LoanClaimRepaymentCommand()
+                AssetLoanManager.ClaimAssetCommand(),
+                AssetLoanManager.ClaimRepaymentCommand()
             )
         )
         .main(args)

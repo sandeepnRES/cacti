@@ -23,6 +23,7 @@ import java.util.Base64
 import java.time.Instant
 import kotlin.system.exitProcess
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.protobuf.ByteString
 import java.util.Calendar
 // Corda
@@ -66,7 +67,7 @@ object AssetLoanManager {
         val token_ledger: String? by option("-tlid", "--token-ledger", help="Token Ledger Id")
         val token_type: String? by option("-tt", "--token-type", help="Token Type")
         val repayment_amount: String? by option("-ra", "--repayment-amount", help="Amount of tokens for repayment")
-        val token_lender: String? by option("-tl", "--token-lender", help="Borrower name in Token ledger as per remoteNetworkConfig.json")
+        val token_lender: String? by option("-tl", "--token-lender", help="Lender name in Token ledger as per remoteNetworkConfig.json")
         val token_borrower: String? by option("-tb", "--token-borrower", help="Borrower name in Token ledger as per remoteNetworkConfig.json")
         val loan_period: String? by option("-l", "--loan-period", help="Asset Loan period in days")
         val observer: String? by option("-o", "--observer", help="Party Name for Observer")
@@ -86,7 +87,7 @@ object AssetLoanManager {
                         password = "test",
                         rpcPort = config["CORDA_PORT"]!!.toInt())
                 try {
-                    val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                    val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                     hash.setPreimage(secret!!)
                     val claimInfoData = AssetClaimHTLCData(
                         hashMechanism = getHashMechanism(hash.HASH_MECHANISM),
@@ -140,17 +141,21 @@ object AssetLoanManager {
             help = "Locks an asset. $ ./clients transfer pledge-asset --fungible --timeout=10 -rnid 'Corda_Network2' --recipient='<name of recipient>' --param=type:amount") {
         val config by requireObject<Map<String, String>>()
         val timeout: String? by option("-t", "--timeout", help="Pledge validity time duration in seconds.")
-        val importNetworkId: String? by option("-inid", "--import-network-id", help="Importing network for asset transfer")
-        val recipient: String? by option("-r", "--recipient", help="Name of the recipient in the importing network")
+        val lender: String? by option("-l", "--lender", help="Lender name in local (token) network")
+        val asset_ledger: String? by option("-alid", "--asset-ledger", help="Asset ledger network for asset loan")
+        val asset_type: String? by option("-at", "--asset-type", help="Loaned Asset Type")
+        val asset_id: String? by option("-aid", "--asset-id", help="Loaned Asset ID")
+        val asset_lender: String? by option("-al", "--asset-lender", help="Lender name in Asset ledger as per remoteNetworkConfig.json")
+        val asset_borrower: String? by option("-ab", "--asset-borrower", help="Borrower name in Asset ledger as per remoteNetworkConfig.json")
         val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
         val observer: String? by option("-o", "--observer", help="Party Name for Observer")
         override fun run() = runBlocking {
-            if (recipient == null) {
-                println("Arguement -r (name of the recipient in importing n/w) is required")
+            if (lender == null) {
+                println("Arguement -l (name of the lender in token n/w) is required")
             } else if (param == null) {
                 println("Arguement -p (asset details to be pledged) is required")
-            } else if (importNetworkId == null) {
-                println("Arguement -inid (importing/remote network id) is required")
+            } else if (asset_ledger == null) {
+                println("Arguement -alid (asset network id) is required")
             } else {
                 var nTimeout: Long
                 if (timeout == null) {
@@ -184,22 +189,41 @@ object AssetLoanManager {
                        obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                     }
 
-                    // Obtain the recipient certificate from the name of the recipient
-                    val recipientCert: String = getUserCertFromFile(recipient!!, importNetworkId!!)
+                    val myCert = fetchCertBase64Helper(rpc.proxy)
+                    val lenderCert = fetchCertBase64Helper(rpc.proxy, lender!!)
+                    println("Lender: $lender. \n\nLenderCert: $lenderCert")
 
+                    // Obtain the recipient certificate from the name of the recipient
+                    val assetLedgerBorrowerCert: String = getUserCertFromFile(asset_borrower!!, asset_ledger!!)
+                    val assetLedgerLenderCert: String = getUserCertFromFile(asset_lender!!, asset_ledger!!)
+                    val pledgeCondition = LoanRepaymentCondition(
+                        tokenType = params[0],
+                        tokenQuantity = params[1].toLong(),
+                        tokenLedgerId = localNetworkId!!,
+                        tokenLedgerLenderCert = lenderCert,
+                        tokenLedgerBorrowerCert = myCert,
+                        assetType = asset_type!!,
+                        assetId = asset_id!!,
+                        assetLedgerId = asset_ledger!!,
+                        assetLedgerLenderCert = assetLedgerLenderCert,
+                        assetLedgerBorrowerCert = assetLedgerBorrowerCert
+                    )
+                    val gson = GsonBuilder().create();
+                    var marshalledPledgeCondition = gson.toJson(pledgeCondition, LoanRepaymentCondition::class.java)
 
                     val result = AssetTransferSDK.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
-                        importNetworkId!!,
+                        asset_ledger!!,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        recipientCert,
+                        lenderCert,
                         nTimeout,
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
                         AssetContract.Commands.LoanPledge(),
                         issuer,
-                        obs
+                        obs,
+                        marshalledPledgeCondition.toByteArray()
                     )
                     
                     
@@ -223,7 +247,7 @@ object AssetLoanManager {
     /**
      * Claim the loaned asset
      */
-    class LoanClaimAssetCommand : CliktCommand(
+    class ClaimAssetCommand : CliktCommand(
             help = "Claim a loaned asset. claim-asset --pledge-id=abc --recipient='PartyA'") {
         val config by requireObject<Map<String, String>>()
         val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset loan pledge state")
@@ -313,7 +337,7 @@ object AssetLoanManager {
     /**
      * Claim repayment
      */
-    class LoanClaimRepaymentCommand : CliktCommand(
+    class ClaimRepaymentCommand : CliktCommand(
             help = "Claim a loaned payment. claim-repayment --pledge-id=abc --recipient='PartyA'") {
         val config by requireObject<Map<String, String>>()
         val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset loan pledge state")

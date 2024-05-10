@@ -116,8 +116,10 @@ class AssetContract : Contract {
                     && assetState.tokenType == pledgeCondition.tokenType
                 )
                 
+                println("${pledgeState.recipientCert}")
+                println("\n${pledgeCondition.tokenLedgerLenderCert}")
                 "Borrower should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.tokenLedgerBorrowerCert)
-                "Lender should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerLenderCert)
+                "Lender should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerLenderCert)
                 
                 val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
                 "There should be a single reference input network id." using (inReferences.size == 1)

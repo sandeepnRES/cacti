@@ -44,7 +44,8 @@ class AssetTransferSDK {
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData,
             issuer: Party,
-            observers: List<Party> = listOf<Party>()
+            observers: List<Party> = listOf<Party>(),
+            pledgeCondition: ByteArray = ByteArray(0)
         ): Either<Error, String> {
             return try {
                 AssetTransferSDK.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
@@ -58,8 +59,8 @@ class AssetTransferSDK {
                         expiryTimeSecs, // @property expiryTimeSecs
                         getAssetStateAndRefFlow, // @property getAssetStateAndRefFlow
                         deleteAssetStateCommand, // @property deleteAssetStateCommand
-                        ByteArray(0), // Empty pledge condition for asset transfer
-                        null,
+                        pledgeCondition, // Empty pledge condition for asset transfer
+                        null,   // @property recipient
                         issuer, // @property issuer
                         observers // @property observers
                     )
@@ -91,7 +92,8 @@ class AssetTransferSDK {
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData,
             issuer: Party,
-            observers: List<Party> = listOf<Party>()
+            observers: List<Party> = listOf<Party>(),
+            pledgeCondition: ByteArray = ByteArray(0)
         ): Either<Error, String> {
             return try {
                 AssetTransferSDK.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
@@ -105,8 +107,8 @@ class AssetTransferSDK {
                         expiryTimeSecs, // @property expiryTimeSecs
                         getAssetStateAndRefFlow, // @property getAssetStateAndRefFlow
                         deleteAssetStateCommand, // @property deleteAssetStateCommand
-                        ByteArray(0), // Empty pledge condition for asset transfer
-                        null,
+                        pledgeCondition, // Empty pledge condition for asset transfer
+                        null,   // @property recipient
                         issuer, // @property issuer
                         observers // @property observers
                     )
