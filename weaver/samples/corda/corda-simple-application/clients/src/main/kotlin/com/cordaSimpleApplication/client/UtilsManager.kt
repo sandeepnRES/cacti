@@ -64,12 +64,18 @@ class GetHashCommand : CliktCommand(name = "hash",
 /**
  * Helper function used by IssueBondAssetStateCommand
  */
-fun fetchCertBase64Helper(proxy: CordaRPCOps) : String {
+fun fetchCertBase64Helper(proxy: CordaRPCOps, otherPartyName: String = "") : String {
     var certPemBase64: String = ""
     try {
-        val partyName: CordaX500Name = proxy.nodeInfo().legalIdentities.get(0).name
-
-        val cert: X509Certificate = proxy.nodeInfo().identityAndCertFromX500Name(partyName).certificate
+        var cert: X509Certificate
+        if (otherPartyName=="") {
+            val partyName: CordaX500Name = proxy.nodeInfo().legalIdentities.get(0).name
+            cert = proxy.nodeInfo().identityAndCertFromX500Name(partyName).certificate
+        } else {
+            val partyName: CordaX500Name = CordaX500Name.parse(otherPartyName)
+            val otherParty = proxy.wellKnownPartyFromX500Name(partyName)!!
+            cert = proxy.nodeInfoFromParty(otherParty)!!.identityAndCertFromX500Name(partyName).certificate
+        }
         val certPem: String = x509CertToPem(cert)
         certPemBase64 = Base64.getEncoder().encodeToString(certPem.toByteArray())
     } catch (e: Exception) {
