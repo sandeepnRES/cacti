@@ -22,7 +22,8 @@ class AssetClaimStatusSerializer: SerializationCustomSerializer<AssetTransfer.As
         val recipient: String,
         val claimStatus: Boolean,
         val expiryTimeSecs: Long,
-        val expirationStatus: Boolean
+        val expirationStatus: Boolean,
+        val pledgeCondition: ByteArray
     )
 
     /**
@@ -36,7 +37,8 @@ class AssetClaimStatusSerializer: SerializationCustomSerializer<AssetTransfer.As
             recipient = obj.recipient,
             claimStatus = obj.claimStatus,
             expiryTimeSecs = obj.expiryTimeSecs,
-            expirationStatus = obj.expirationStatus
+            expirationStatus = obj.expirationStatus,
+            pledgeCondition = obj.pledgeCondition.toByteArray()
     )
 
     /** The function fromProxy describes how the Proxy class should be converted back to a
@@ -51,6 +53,7 @@ class AssetClaimStatusSerializer: SerializationCustomSerializer<AssetTransfer.As
                 .setClaimStatus(proxy.claimStatus)
                 .setExpiryTimeSecs(proxy.expiryTimeSecs)
                 .setExpirationStatus(proxy.expirationStatus)
+                .setPledgeCondition(ByteString.copyFrom(proxy.pledgeCondition))
                 .build()
     }
 }

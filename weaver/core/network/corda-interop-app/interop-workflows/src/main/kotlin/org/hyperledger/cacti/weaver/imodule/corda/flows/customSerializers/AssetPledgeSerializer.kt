@@ -20,7 +20,8 @@ class AssetPledgeSerializer: SerializationCustomSerializer<AssetTransfer.AssetPl
         val localNetworkID: String,
         val remoteNetworkID: String,
         val recipient: String,
-        val expiryTimeSecs: Long
+        val expiryTimeSecs: Long,
+        val pledgeCondition: ByteArray
     )
 
     /**
@@ -32,7 +33,8 @@ class AssetPledgeSerializer: SerializationCustomSerializer<AssetTransfer.AssetPl
             localNetworkID = obj.localNetworkID,
             remoteNetworkID = obj.remoteNetworkID,
             recipient = obj.recipient,
-            expiryTimeSecs = obj.expiryTimeSecs
+            expiryTimeSecs = obj.expiryTimeSecs,
+            pledgeCondition = obj.pledgeCondition.toByteArray()
     )
 
     /** The function fromProxy describes how the Proxy class should be converted back to a
@@ -45,6 +47,7 @@ class AssetPledgeSerializer: SerializationCustomSerializer<AssetTransfer.AssetPl
                 .setRemoteNetworkID(proxy.remoteNetworkID)
                 .setRecipient(proxy.recipient)
                 .setExpiryTimeSecs(proxy.expiryTimeSecs)
+                .setPledgeCondition(ByteString.copyFrom(proxy.pledgeCondition))
                 .build()
     }
 }
