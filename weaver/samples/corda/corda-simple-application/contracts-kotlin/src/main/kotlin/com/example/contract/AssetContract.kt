@@ -116,8 +116,8 @@ class AssetContract : Contract {
                     && assetState.tokenType == pledgeCondition.tokenType
                 )
                 
-                println("${pledgeState.recipientCert}")
-                println("\n${pledgeCondition.tokenLedgerLenderCert}")
+                //println("${pledgeState.recipientCert}")
+                //println("\n${pledgeCondition.tokenLedgerLenderCert}")
                 "Borrower should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.tokenLedgerBorrowerCert)
                 "Lender should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerLenderCert)
                 
@@ -147,3 +147,4 @@ class AssetContract : Contract {
         // Flow that will read the total fungible token assets of a given type
     }
 }
+
