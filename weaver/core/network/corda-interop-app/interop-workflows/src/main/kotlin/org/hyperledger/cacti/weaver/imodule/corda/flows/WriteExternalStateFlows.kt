@@ -216,11 +216,29 @@ class GetExternalStateByLinearId(
  * The GetExternalBoLByLinearId flow is used to read an External State and parse
  * the View Data.
  *
+ * @property externalStateLinearId the string linearId for the ExternalState.
+ */
+/*@StartableByRPC
+class GetExternalStateAndRefByLinearId(
+        val externalStateLinearId: String
+) : FlowLogic<StateAndRef<ExternalState>>() {
+    @Suspendable
+    override fun call(): StateAndRef<ExternalState> {
+        val linearId = UniqueIdentifier.fromString(externalStateLinearId)
+        return GetExternalStateAndRefByLinearId(linearId)
+    }
+
+}*/
+
+/**
+ * The GetExternalBoLByLinearId flow is used to read an External State and parse
+ * the View Data.
+ *
  * @property externalStateLinearId the linearId for the ExternalState.
  */
 @StartableByRPC
 class GetExternalStateAndRefByLinearId(
-        val externalStateLinearId: String
+        val externalStateLinearId: UniqueIdentifier
 ) : FlowLogic<StateAndRef<ExternalState>>() {
     /**
      * The call() method captures the logic to read external state written into the vault,
@@ -231,15 +249,13 @@ class GetExternalStateAndRefByLinearId(
     @Suspendable
     override fun call(): StateAndRef<ExternalState> {
         println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
-        val linearId = UniqueIdentifier.fromString(externalStateLinearId)
-        //val linearId = externalStateLinearId
         val states = serviceHub.vaultService.queryBy<ExternalState>(
-                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(externalStateLinearId))
         ).states
 
         if (states.isEmpty()) {
-            println("Error: Could not find external state with linearId $linearId")
-            throw IllegalArgumentException("Error: Could not find external state with linearId $linearId")
+            println("Error: Could not find external state with linearId $externalStateLinearId")
+            throw IllegalArgumentException("Error: Could not find external state with linearId $externalStateLinearId")
         } else {
             return states.first()
         }

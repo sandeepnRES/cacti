@@ -180,8 +180,8 @@ object PledgeAsset {
                 }
                 try {
                     val txId = subFlow(signTransactionFlow).id
-                    println("Issuer signed transaction.")
-                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                    println("Issuer signed asset pledge transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 } catch (e: Exception) {
                     val errorMsg = "Error signing unlock asset transaction: ${e.message}\n"
                     println(errorMsg)
@@ -386,7 +386,7 @@ class GetAssetPledgeStatus(
             QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
         ).states
         if (states.isEmpty()) {
-
+            println("No such states found")
             val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
             val fetchedNetworkIdState = networkIdStateRef!!.state.data
 
@@ -466,7 +466,7 @@ object ReclaimPledgedAsset {
     constructor(
         val pledgeId: String,
         val assetStateCreateCommand: CommandData,
-        val claimStatusLinearId: String,
+        val claimStatusLinearIdStr: String,
         val issuer: Party,
         val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -479,9 +479,9 @@ object ReclaimPledgedAsset {
         @Suspendable
         override fun call(): Either<Error, SignedTransaction> = try {
             val linearId = getLinearIdFromString(pledgeId)
-
+            val claimStatusLinearId = UniqueIdentifier.fromString(claimStatusLinearIdStr)
             val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearId))
-            val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
+            val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearIdStr))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
             val payloadDecoded = Base64.getDecoder().decode(interopPayload.payload.toByteArray())
@@ -605,7 +605,7 @@ object ReclaimPledgedAsset {
                 try {
                     val txId = subFlow(signTransactionFlow).id
                     println("Issuer signed transaction.")
-                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 } catch (e: Exception) {
                     val errorMsg = "Error signing reclaim asset transaction: ${e.message}\n"
                     println(errorMsg)
@@ -623,7 +623,7 @@ object ReclaimPledgedAsset {
                 try {
                     val txId = subFlow(signTransactionFlow).id
                     println("Locker signed transaction.")
-                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 } catch (e: Exception) {
                     val errorMsg = "Error signing reclaim asset transaction by Locker: ${e.message}\n"
                     println(errorMsg)
@@ -691,7 +691,7 @@ object ClaimRemoteAsset {
     @JvmOverloads
     constructor(
         val pledgeId: String,
-        val pledgeStatusLinearId: String,
+        val pledgeStatusLinearIdStr: String,
         val getAssetAndContractIdFlowName: String,
         val assetType: String,
         val assetIdOrQuantity: Any,
@@ -710,8 +710,9 @@ object ClaimRemoteAsset {
         override fun call(): Either<Error, SignedTransaction> = try {
 
             // get the asset pledge details fetched earlier via interop query from import to export n/w
+            val pledgeStatusLinearId = UniqueIdentifier.fromString(pledgeStatusLinearIdStr)
             val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(pledgeStatusLinearId))
-            val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
+            val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearIdStr))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
             val payloadDecoded = Base64.getDecoder().decode(interopPayload.payload.toByteArray())
@@ -857,13 +858,16 @@ object ClaimRemoteAsset {
                         // Pledge State checks
                         "Expiry Time should match in PledgeState and ClaimStatus" using (remotePledgeStatus.expiryTimeSecs == claimState.expiryTimeSecs)
                         "Recipient should match in Pledge State and ClaimStatus" using (remotePledgeStatus.recipient == claimState.recipientCert)
-                        "NetworkId should match in Pledge State and ClaimStatu" using (remotePledgeStatus.remoteNetworkID == claimState.localNetworkID)
+                        "NetworkId should match in Pledge State and ClaimStatus" using (remotePledgeStatus.remoteNetworkID == claimState.localNetworkID)
+            
+                        val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
+                        "The pledged asset should not have been claimed already" using (existingAssetClaimStatusState == null)
                     }
                 }
                 try {
                     val txId = subFlow(signTransactionFlow).id
                     println("Party: ${ourIdentity} signed transaction.")
-                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 } catch (e: Exception) {
                     val errorMsg = "Error signing claim asset transaction: ${e.message}\n"
                     println(errorMsg)
