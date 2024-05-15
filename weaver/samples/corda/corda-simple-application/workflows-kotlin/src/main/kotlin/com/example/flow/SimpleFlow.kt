@@ -140,7 +140,7 @@ class CreateFromExternalState(
         println("Creating state from External State...")
         // Obtain a reference to the notary we want to use.
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
-        val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(externalStateLinearIds[0].toString()))
+        val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(externalStateLinearIds[0]))
         val value = getPayloadFromView(getViewFromExternalState(externalStateAndRef.state.data)).toString(Charsets.UTF_8)
         
         progressTracker.currentStep = GENERATING_TRANSACTION
