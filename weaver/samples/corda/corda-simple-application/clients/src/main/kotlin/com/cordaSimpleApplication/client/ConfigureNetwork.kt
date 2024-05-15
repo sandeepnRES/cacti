@@ -113,6 +113,7 @@ fun configureCreateAllHelper() {
     val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
     val baseNodesPath = System.getenv("BASE_NODE_PATH") ?: "../../../tests/network-setups/corda/dev/" + networkName + "/build/nodes/"
     val nodesList = System.getenv("NODES_LIST") ?: "PartyA"
+    val verificationCriteria = System.getenv("VERIFICATION_CRITERIA") ?: ""
 
     val partyHost = System.getenv("CORDA_HOST") ?: "localhost"
     val partyPort = System.getenv("CORDA_PORT") ?: "10006"
@@ -156,7 +157,11 @@ fun configureCreateAllHelper() {
     println("Access Control Policy written to ${destPath}/access-control.json")
 
     // Generate Verification Policy
-    val verificationPolicy = credentialsCreator.createVerificationPolicy()
+    var criteria: List<String>? = null
+    if (verificationCriteria != "") {
+        criteria = verificationCriteria.split(",") 
+    }
+    val verificationPolicy = credentialsCreator.createVerificationPolicy(criteria)
     File(destPath + "/verification-policy.json").bufferedWriter().use { out ->
       out.write(jsonPrinter.print(verificationPolicy))
     }

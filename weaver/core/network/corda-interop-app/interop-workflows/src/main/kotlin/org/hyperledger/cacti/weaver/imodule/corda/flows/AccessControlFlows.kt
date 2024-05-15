@@ -65,10 +65,11 @@ constructor(
             
             // Create the access control to store with our identity listed as a participant
             val outputState = accessControlPolicy.copy(participants = listOf(ourIdentity) + sharedParties)
+            val participantsKeys = outputState.participants.map{ it.owningKey }
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
-            val command = Command(AccessControlPolicyStateContract.Commands.Issue(), ourIdentity.owningKey)
+            val command = Command(AccessControlPolicyStateContract.Commands.Issue(), participantsKeys)
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(outputState, AccessControlPolicyStateContract.ID)
                     .addCommand(command)
@@ -159,12 +160,13 @@ class UpdateAccessControlPolicyState(val accessControlPolicyState: AccessControl
                     rules = accessControlPolicyState.rules
             )
             println("Updating access control policy state to $outputState\n")
+            val participantsKeys = outputState.participants.map{ it.owningKey }
 
             // 3. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
             val command = Command(
                     AccessControlPolicyStateContract.Commands.Update(),
-                    listOf(ourIdentity.owningKey))
+                    participantsKeys)
             val txBuilder = TransactionBuilder(notary)
                     .addInputState(inputState)
                     .addOutputState(outputState, AccessControlPolicyStateContract.ID)
