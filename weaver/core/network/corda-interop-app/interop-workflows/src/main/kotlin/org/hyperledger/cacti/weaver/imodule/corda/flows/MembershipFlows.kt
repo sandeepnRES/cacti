@@ -54,10 +54,11 @@ class CreateMembershipState(
 
             // Create the membership to store with our identity listed as a participant
             val outputState = membership.copy(participants = listOf(ourIdentity) + sharedParties)
+            val participantsKeys = outputState.participants.map{ it.owningKey }
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
-            val command = Command(MembershipStateContract.Commands.Issue(), ourIdentity.owningKey)
+            val command = Command(MembershipStateContract.Commands.Issue(), participantsKeys)
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(outputState, MembershipStateContract.ID)
                     .addCommand(command)
@@ -144,10 +145,11 @@ class UpdateMembershipState(val membership: MembershipState) : FlowLogic<Either<
         )
 
         println("Updating state to $outputState\n")
+        val participantsKeys = outputState.participants.map{ it.owningKey }
 
         // 3. Build the transaction
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val command = Command(MembershipStateContract.Commands.Update(), listOf(ourIdentity.owningKey))
+        val command = Command(MembershipStateContract.Commands.Update(), participantsKeys)
         val txBuilder = TransactionBuilder(notary)
                 .addInputState(inputState)
                 .addOutputState(outputState, MembershipStateContract.ID)

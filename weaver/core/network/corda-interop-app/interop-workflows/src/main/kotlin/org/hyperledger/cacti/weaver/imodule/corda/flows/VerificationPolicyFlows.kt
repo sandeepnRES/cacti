@@ -59,10 +59,11 @@ constructor(
 
             // Create the verification policy to store with our identity listed as a participant
             val outputState = verificationPolicy.copy(participants = listOf(ourIdentity) + sharedParties)
+            val participantsKeys = outputState.participants.map{ it.owningKey }
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
-            val command = Command(VerificationPolicyStateContract.Commands.Issue(), ourIdentity.owningKey)
+            val command = Command(VerificationPolicyStateContract.Commands.Issue(), participantsKeys)
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(outputState, VerificationPolicyStateContract.ID)
                     .addCommand(command)
@@ -148,10 +149,11 @@ class UpdateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
                 identifiers = verificationPolicy.identifiers)
 
         println("Updating state to $outputState\n")
+        val participantsKeys = outputState.participants.map{ it.owningKey }
 
         // 3. Build the transaction
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val command = Command(VerificationPolicyStateContract.Commands.Update(), listOf(ourIdentity.owningKey))
+        val command = Command(VerificationPolicyStateContract.Commands.Update(), participantsKeys)
         val txBuilder = TransactionBuilder(notary)
                 .addInputState(inputState)
                 .addOutputState(outputState, VerificationPolicyStateContract.ID)

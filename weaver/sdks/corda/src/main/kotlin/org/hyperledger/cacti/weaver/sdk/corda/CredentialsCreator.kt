@@ -104,10 +104,11 @@ class CredentialsCreator(
     /*
      * @return Returns Verification policy proto object.
      */
-    fun createVerificationPolicy(): VerificationPolicyOuterClass.VerificationPolicy {
+    fun createVerificationPolicy(verificationCriteria: List<String>? = listOf<String>()): VerificationPolicyOuterClass.VerificationPolicy {
+        val criteria = if (verificationCriteria == null || verificationCriteria.isEmpty()) this.nodes.toList() else verificationCriteria
         val policyProto = VerificationPolicyOuterClass.Policy.newBuilder()
             .setType("Signature")
-            .addAllCriteria(this.nodes.toList())
+            .addAllCriteria(criteria)
         val identifierProto = VerificationPolicyOuterClass.Identifier.newBuilder()
             .setPattern(this.locFlow)
             .setPolicy(policyProto)
