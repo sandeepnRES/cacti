@@ -33,9 +33,12 @@ import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.transactions.SignedTransaction
 // cacti weaver sdk
 import org.hyperledger.cacti.weaver.sdk.corda.HashFunctions
 import org.hyperledger.cacti.weaver.sdk.corda.AssetTransferSDK
+import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.RelayOptions
 // cacti weaver imodule
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetClaimHTLCData
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
@@ -310,9 +313,22 @@ object AssetLoanManager {
                     //    below from the remote-network-config.json file
                     //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
                     //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                    val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(assetRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
+                    //val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(assetRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
+                    
+                    val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
+                    val replaceIndex = 1
+                    interopFlowHelper(
+                        assetRelayAddress!!,
+                        externalStateAddress,
+                        "com.cordaSimpleApplication.flow.ClaimLoanedAssetInitiator",
+                        flowArgs,
+                        replaceIndex,
+                        rpc.proxy,
+                        config,
+                        listOf(issuer)
+                    ) 
 
-                    val result = runCatching {
+                    /*val result = runCatching {
                         rpc.proxy.startFlow(::ClaimLoanedAssetInitiator, pledgeId!!, pledgeStatusLinearId, issuer, obs)
                             .returnValue.get()
                     }.fold({ it ->
@@ -322,8 +338,8 @@ object AssetLoanManager {
                         }
                     }, { it -> 
                         println("Corda Network Error: Error running ClaimLoanedAsset flow: ${it.message}\n")
-                    })
-                    println("Loaned asset claim by borrower response: ${result}")
+                    })*/
+                    println("Loaned asset claim by borrower successful")
                 } catch (e: Exception) {
                     println("Error: ${e.toString()}")
                     // exit the process throwing error code
@@ -407,8 +423,21 @@ object AssetLoanManager {
                     //    below from the remote-network-config.json file
                     //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
                     //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                    val claimStatusLinearId: String = requestStateFromRemoteNetwork(tokenRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
+                    //val claimStatusLinearId: String = requestStateFromRemoteNetwork(tokenRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
 
+                    val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
+                    val replaceIndex = 1
+                    interopFlowHelper(
+                        tokenRelayAddress!!,
+                        externalStateAddress,
+                        "com.cordaSimpleApplication.flow.ClaimLoanRepaymentInitiator",
+                        flowArgs,
+                        replaceIndex,
+                        rpc.proxy,
+                        config,
+                        listOf(issuer)
+                    ) 
+                    /*
                     val result = runCatching {
                         rpc.proxy.startFlow(::ClaimLoanRepaymentInitiator, pledgeId!!, claimStatusLinearId, issuer, obs)
                             .returnValue.get()
@@ -419,8 +448,8 @@ object AssetLoanManager {
                         }
                     }, { it -> 
                         println("Corda Network Error: Error running ClaimLoanRepaymentInitiator flow: ${it.message}\n")
-                    })
-                    println("Loan repayment claim by lender response: ${result}")
+                    })*/
+                    println("Loan repayment claim by lender response")
                 } catch (e: Exception) {
                     println("Error: ${e.toString()}")
                     // exit the process throwing error code
@@ -449,11 +478,77 @@ fun getClaimRepaymentViewAddress(assetLedgerType: String, remotePledgeId: String
     // tokenBorrowerCert -> locker
     // assetLenderCert -> recipient
     if (assetLedgerType.equals("corda")) {
-        return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetBondAssetClaimStatusByPledgeId", listOf(remotePledgeId, expiryTimeSecs))
+        return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetBondAssetPledgeStatusByPledgeId", listOf(remotePledgeId, localNetworkId))
     } else if (assetLedgerType.equals("fabric")) {
         throw Error("Unsupported ledger type: ${assetLedgerType}")
         //return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetAssetClaimStatus", listOf(remotePledgeId, assetType!!, assetId!!, assetLenderCert!!, tokenBorrowerCert!!, remoteNetworkId, expiryTimeSecs))
     } else {
         throw Error("Unsupported ledger type: ${assetLedgerType}")
     }
+}
+
+/*
+ * This is used to fetch the requested state from a remote network, save in local vault, and return the vault ID.
+ * In case of Claim by a network, this is used to fetch the pledge-status in the export network.
+ * In case of Reclaim by a network, this is used to fetch the claim-status in the import network.
+ */
+fun interopFlowHelper(
+    localRelayAddress: String,
+    externalStateAddress: String,
+    flowName: String,
+    flowArgs: List<Any>,
+    replaceIndex: Int,
+    proxy: CordaRPCOps,
+    config: Map<String, String>,
+    externalStateParticipants: List<Party>)
+{
+    var linearId: String = ""
+    val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
+
+    try {
+        val relayOptions = RelayOptions(
+            useTlsForRelay = config["RELAY_TLS"]!!.toBoolean(),
+            relayTlsTrustStorePath = config["RELAY_TLSCA_TRUST_STORE"]!!,
+            relayTlsTrustStorePassword = config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
+            tlsCACertPathsForRelay = config["RELAY_TLSCA_CERT_PATHS"]!!
+        )
+        InteroperableHelper.interopFlow(
+            proxy,
+            arrayOf(externalStateAddress),
+            localRelayAddress,
+            networkName,
+            false,
+            flowName,
+            flowArgs,
+            replaceIndex,
+            externalStateParticipants = externalStateParticipants,
+            relayOptions = relayOptions
+        ).fold({
+            println("Error in Interop Flow: ${it.message}")
+            exitProcess(1)
+        }, {
+            if (it is Either<*, *>) {
+                it.fold({
+                    println("Error in Interop Flow: ${it}")
+                    exitProcess(1)
+                }, {
+                    println("Successful response: ${it}")
+                    val stx = it as SignedTransaction
+                    val createdState = stx.tx.outputStates.first()
+                    println("Created state: ${createdState}")
+                })
+                
+            } else {
+                println("Successful response: ${it}")
+                val stx = it as SignedTransaction
+                val createdState = stx.tx.outputStates.first()
+                println("Created state: ${createdState}")
+            }
+        })
+    } catch (e: Exception) {
+        println("Error: ${e.toString()}")
+        // exit the process throwing error code
+        exitProcess(1)
+    }
+
 }

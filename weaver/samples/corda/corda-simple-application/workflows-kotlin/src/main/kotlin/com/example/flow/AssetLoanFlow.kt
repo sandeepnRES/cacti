@@ -61,6 +61,7 @@ import org.hyperledger.cacti.weaver.imodule.corda.flows.parseExternalStateForCla
 
 import org.hyperledger.cacti.weaver.imodule.corda.contracts.AssetTransferContract
 import org.hyperledger.cacti.weaver.imodule.corda.contracts.AssetExchangeHTLCStateContract
+import org.hyperledger.cacti.weaver.imodule.corda.contracts.ExternalStateContract
 
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetExchangeHTLCState
@@ -157,7 +158,7 @@ constructor(
                 val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(borrower, serviceHub)).toByteArray())
                 
                 // Get asset and update pledgeCondition
-                val bondAsset = assetExchangeHTLCState.assetStatePointer!!.resolve(serviceHub).state.data as BondAssetState
+                val bondAsset = assetExchangeHTLCState.assetStatePointer.resolve(serviceHub).state.data as BondAssetState
                 val pledgeCondition = pledgeConditionArgs.copy(
                     assetType = bondAsset.type,
                     assetId = bondAsset.id,
@@ -235,10 +236,6 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
     @Suspendable
     override fun call(): SignedTransaction {
         val role = session.receive<AssetLoanResponderRole>().unwrap { it }
-        fun checkLoanPledge(tx: LedgerTransaction): Boolean {
-            
-            return true
-        }
         if (role == AssetLoanResponderRole.SIGNER) {
             val signTransactionFlow = object : SignTransactionFlow(session) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
@@ -248,7 +245,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     "There should be either BondAssetState or HTLC State as input." using (assetStates.size == 1 || htlcStates.size == 1)
                     "There should be one output AssetPledgeState." using (lTx.outputsOfType<AssetPledgeState>().size == 1)
                     
-                    val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer!!.resolve(serviceHub).state.data as BondAssetState
+                    val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer.resolve(serviceHub).state.data as BondAssetState
                     val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
                     val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
                     
@@ -285,7 +282,6 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     
                     val assetState = htlcStates[0].assetStatePointer.resolve(serviceHub).state.data as BondAssetState
                     val pledgeState = lTx.outputsOfType<AssetPledgeState>()[0]
-                    println("a7")
                     val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
                     
                     "Pledge asset should be same as in pledge condition." using (assetState.id == pledgeCondition.assetId
@@ -295,13 +291,10 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
                     "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerBorrowerCert)
                     
-                    println("a8")
                     val inReferences = lTx.referenceInputRefsOfType<NetworkIdState>()
-                    println("a9")
                     "There should be a single reference input network id." using (inReferences.size == 1)
 
                     val validNetworkIdState = inReferences.get(0).state.data
-                    println("a10")
                     "Asset ledger should be correct in pledge condition." using (pledgeCondition.assetLedgerId.equals(validNetworkIdState.networkId))
                     
                     //"Loan Pledge conditions should be satisified" using (checkLoanPledge(lTx) == true)
@@ -340,7 +333,7 @@ class ClaimLoanedAssetInitiator
 @JvmOverloads
 constructor(
     val pledgeId: String,
-    val pledgeStatusLinearId: String,
+    val externalPledgeStatusLinearIds: Array<UniqueIdentifier>,
     val issuer: Party,
     val observers: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -365,12 +358,15 @@ constructor(
         4. Borrower and Issuer should be signer
         */
         val localPledgeRef = subFlow(GetAssetPledgeStateById(pledgeId))!!
-        val remotePledgeRef = subFlow(GetExternalStateAndRefByLinearId(pledgeStatusLinearId))
+        val remotePledgeRef = subFlow(GetExternalStateAndRefByLinearId(externalPledgeStatusLinearIds[0]))
+        println("Remote Pledge: ${remotePledgeRef.state.data}")
         val remotePledge = parseExternalStateForPledgeStatus(remotePledgeRef.state.data)
+        println("Remote Pledge: $remotePledge")
         val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
         val lender = localPledgeRef.state.data.locker
         val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(lender, serviceHub)).toByteArray())
         
+        println("Remote Pledge Condition JSON: ${remotePledge.pledgeCondition.toStringUtf8()}")
         val pledgeConditionFromTokenLedger = Gson().fromJson(remotePledge.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
         val pledgeConditionFromAssetLedger = Gson().fromJson(ByteString.copyFrom(localPledgeRef.state.data.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
         
@@ -384,7 +380,10 @@ constructor(
         
         val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
         val fetchedNetworkIdState = networkIdStateRef!!.state.data
-        
+       
+        println("from Asset Ledger: $pledgeConditionFromAssetLedger\n") 
+        println("from Token Ledger: $pledgeConditionFromTokenLedger\n")
+
         if (pledgeConditionFromAssetLedger != pledgeConditionFromTokenLedger) {
             println("Repayment condition doesn't match in asset and token pledges")
             Left(Error("Repayment condition doesn't match in asset and token pledges")) 
@@ -400,74 +399,79 @@ constructor(
         } else if (fetchedNetworkIdState.networkId != remotePledge.remoteNetworkID) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged to a claimer in this network.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged to a claimer in this network."))
-        }
+        } else {
         
-        val marshalledBondAsset = getBondAssetJsonStringFromStatePointer(localPledgeRef.state.data, serviceHub)
-        
-        val assetClaimStatusState = AssetClaimStatusState(
-            pledgeId,
-            // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
-            marshalledBondAsset, // @property assetDetails
-            fetchedNetworkIdState.networkId, // @property localNetworkID
-            remotePledge.localNetworkID, // @property remoteNetworkID
-            ourIdentity, // @property recipient
-            borrowerCert,
-            true, // @property claimStatus
-            remotePledge.expiryTimeSecs, // @property expiryTimeSecs
-            false, // @property expirationStatus
-            localPledgeRef.state.data.pledgeCondition
-        )
-        
-        val notary = networkIdStateRef.state.notary
-        val claimCmd = Command(AssetTransferContract.Commands.ClaimRemoteAsset(),
-            listOf(
-                ourIdentity.owningKey
+            val marshalledBondAsset = getBondAssetJsonStringFromStatePointer(localPledgeRef.state.data, serviceHub)
+            
+            val assetClaimStatusState = AssetClaimStatusState(
+                pledgeId,
+                // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
+                marshalledBondAsset, // @property assetDetails
+                fetchedNetworkIdState.networkId, // @property localNetworkID
+                remotePledge.localNetworkID, // @property remoteNetworkID
+                ourIdentity, // @property recipient
+                borrowerCert,
+                true, // @property claimStatus
+                localPledgeRef.state.data.expiryTimeSecs, // @property expiryTimeSecs
+                false, // @property expirationStatus
+                localPledgeRef.state.data.pledgeCondition
             )
-        )
-        val assetCreateCmd = Command(BondAssetContract.Commands.Issue(),
-            setOf(
-                ourIdentity.owningKey,
-                issuer.owningKey
-            ).toList()
-        )
-        
-        val txBuilder = TransactionBuilder(notary)
-            .addInputState(localPledgeRef)
-            .addInputState(remotePledgeRef)
-            .addOutputState(claimAssetState, BondAssetContract.ID)
-            .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
-            .addCommand(claimCmd)
-            .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-            .addCommand(assetCreateCmd)
-            .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
-        
-        // Verify and collect signatures on the transaction
-        txBuilder.verify(serviceHub)
-        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
-        println("Recipient signed transaction.")
+            
+            val notary = networkIdStateRef.state.notary
+            val claimCmd = Command(AssetTransferContract.Commands.ClaimRemoteAsset(),
+                listOf(
+                    ourIdentity.owningKey
+                )
+            )
+            val assetCreateCmd = Command(BondAssetContract.Commands.Issue(),
+                setOf(
+                    ourIdentity.owningKey,
+                    issuer.owningKey
+                ).toList()
+            )
+            val externalStateConsumeCommand = Command(ExternalStateContract.Commands.Consume(), 
+                remotePledgeRef.state.data.participants.map { it.owningKey }
+            )
+            
+            val txBuilder = TransactionBuilder(notary)
+                .addReferenceState(ReferencedStateAndRef(localPledgeRef))
+                .addInputState(remotePledgeRef)
+                .addOutputState(claimAssetState, BondAssetContract.ID)
+                .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
+                .addCommand(claimCmd)
+                .addCommand(externalStateConsumeCommand)
+                .addCommand(assetCreateCmd)
+                .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                .setTimeWindow(TimeWindow.untilOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs)))
+            
+            // Verify and collect signatures on the transaction
+            txBuilder.verify(serviceHub)
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            println("Recipient signed transaction.")
 
-        var sessions = listOf<FlowSession>()
+            var sessions = listOf<FlowSession>()
 
-        if (!ourIdentity.equals(issuer)) {
-            val issuerSession = initiateFlow(issuer)
-            issuerSession.send(AssetLoanResponderRole.SIGNER)
-            sessions += issuerSession
+            if (!ourIdentity.equals(issuer)) {
+                val issuerSession = initiateFlow(issuer)
+                issuerSession.send(AssetLoanResponderRole.SIGNER)
+                sessions += issuerSession
+            }
+
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            
+            var observerSessions = listOf<FlowSession>()
+            
+            val lockerSession = initiateFlow(lender)
+            lockerSession.send(AssetLoanResponderRole.OBSERVER)
+            observerSessions += lockerSession
+
+            for (obs in observers) {
+                val obsSession = initiateFlow(obs)
+                obsSession.send(AssetLoanResponderRole.OBSERVER)
+                observerSessions += obsSession
+            }
+            Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
         }
-
-        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
-        
-        var observerSessions = listOf<FlowSession>()
-        
-        val lockerSession = initiateFlow(lender)
-        lockerSession.send(AssetLoanResponderRole.OBSERVER)
-        observerSessions += lockerSession
-
-        for (obs in observers) {
-            val obsSession = initiateFlow(obs)
-            obsSession.send(AssetLoanResponderRole.OBSERVER)
-            observerSessions += obsSession
-        }
-        Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
     } catch (e: Exception) {
         println("Error in claiming the loaned asset: ${e.message}\n")
         Left(Error("Failed to claim loaned asset: ${e.message}"))
@@ -483,9 +487,9 @@ class ClaimLoanedAssetAcceptor(val session: FlowSession) : FlowLogic<SignedTrans
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val tx = stx.tx.toLedgerTransaction(serviceHub)
                     // Generic constraints around the transaction that transfers ownership of an asset from one Party to other Party
-                    "There should be one input AssetPledgeState." using (tx.inputsOfType<AssetPledgeState>().size == 1)
+                    "There should be one reference AssetPledgeState." using (tx.referenceInputRefsOfType<AssetPledgeState>().size == 1)
                     "One output state only should be created." using (tx.outputsOfType<BondAssetState>().size == 1)
-                    val pledgeState = tx.inputsOfType<AssetPledgeState>()[0]
+                    val pledgeState = tx.referenceInputRefsOfType<AssetPledgeState>()[0].state.data
                     val assetState = tx.outputsOfType<BondAssetState>()[0]
                     val remotePledgeStatus = parseExternalStateForPledgeStatus(
                         tx.inputsOfType<ExternalState>()[0]
@@ -498,7 +502,7 @@ class ClaimLoanedAssetAcceptor(val session: FlowSession) : FlowLogic<SignedTrans
                     * - output loaned asset state is same as asset in claim status
                     */
                     
-                    val assetPledged = pledgeState.assetStatePointer!!.resolve(tx).state.data as BondAssetState
+                    val assetPledged = pledgeState.assetStatePointer!!.resolve(serviceHub).state.data as BondAssetState
                     
                     "Asset pledged and output asset should be same" using (assetState.id == assetPledged.id
                         && assetState.type == assetPledged.type
@@ -518,10 +522,16 @@ class ClaimLoanedAssetAcceptor(val session: FlowSession) : FlowLogic<SignedTrans
                     val pledgeConditionFromTokenLedger = Gson().fromJson(remotePledgeStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
                     "Pledge condition on both pledges should match" using (pledgeConditionFromAssetLedger == pledgeConditionFromTokenLedger)
                     
-                    val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
-                    val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.recipient!!, serviceHub)).toByteArray())
+                    val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
+                    val borrowerCert = pledgeState.recipientCert
                     
                     "Borrower and Lender parties of Asset in pledgeCondition should be correct" using (pledgeConditionFromTokenLedger.assetLedgerLenderCert == lenderCert && pledgeConditionFromTokenLedger.assetLedgerBorrowerCert == borrowerCert)
+                    
+                    val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                    "There should be a single reference input network id." using (inReferences.size == 1)
+
+                    val validNetworkIdState = inReferences.get(0).state.data
+                    "Asset ledger should be correct in token pledge condition." using (pledgeConditionFromTokenLedger.assetLedgerId.equals(validNetworkIdState.networkId))
                 }
             }
             try {
@@ -552,7 +562,7 @@ class ClaimLoanRepaymentInitiator
 @JvmOverloads
 constructor(
     val pledgeId: String,
-    val claimStatusLinearId: String,
+    val externalPledgeStatusLinearIds: Array<UniqueIdentifier>,
     val issuer: Party,
     val observers: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -573,9 +583,12 @@ constructor(
         4. Borrower and Issuer should be signer
         */
         val localPledgeRef = subFlow(GetAssetPledgeStateById(pledgeId))!!
-        val remoteClaimStatusRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearId))
-        val remoteClaimStatus = parseExternalStateForClaimStatus(remoteClaimStatusRef.state.data)
-        val remotePledgeCondition = Gson().fromJson(remoteClaimStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+        val remotePledgeRef = subFlow(GetExternalStateAndRefByLinearId(externalPledgeStatusLinearIds[0]))
+        val remotePledge = parseExternalStateForPledgeStatus(remotePledgeRef.state.data)
+        println("Remote Pledge: $remotePledge")
+
+        val pledgeConditionFromAssetLedger = Gson().fromJson(remotePledge.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+        val pledgeConditionFromTokenLedger = Gson().fromJson(ByteString.copyFrom(localPledgeRef.state.data.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
         
         
         val claimAssetState = subFlow(UpdateAssetOwnerFromPointer(
@@ -594,85 +607,93 @@ constructor(
         val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(borrower, serviceHub)).toByteArray())
         
         
-        if (currentTimeSecs >= localPledgeRef.state.data.expiryTimeSecs) {
+        if (pledgeConditionFromAssetLedger != pledgeConditionFromTokenLedger) {
+            println("Repayment condition doesn't match in asset and token pledges")
+            Left(Error("Repayment condition doesn't match in asset and token pledges")) 
+        } else if (currentTimeSecs >= localPledgeRef.state.data.expiryTimeSecs) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as the expiry time has elapsed.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as the expiry time has elapsed."))
-        } else if (remotePledgeCondition.tokenLedgerLenderCert != lenderCert) {
+        } else if (pledgeConditionFromAssetLedger.tokenLedgerLenderCert != lenderCert) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged to the the lender.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged to the lender."))
-        } else if (remotePledgeCondition.tokenLedgerBorrowerCert != borrowerCert) {
+        } else if (pledgeConditionFromAssetLedger.tokenLedgerBorrowerCert != borrowerCert) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged by the the borrower.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged by the the borrower."))
-        } else if (fetchedNetworkIdState.networkId != remoteClaimStatus.remoteNetworkID) {
+        } else if (fetchedNetworkIdState.networkId != remotePledge.remoteNetworkID) {
             println("Cannot claim loaned asset with pledgeId ${pledgeId} as it has not been pledged to a claimer in this network.")
             Left(Error("Cannot claim loaned asset with pledged ${pledgeId} as it has not been pledged to a claimer in this network."))
-        }
+        } else {
         
-        val marshalledAsset = getAssetJsonStringFromStatePointer(localPledgeRef.state.data, serviceHub)
-        
-        val assetClaimStatusState = AssetClaimStatusState(
-            pledgeId,
-            // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
-            marshalledAsset, // @property assetDetails
-            fetchedNetworkIdState.networkId, // @property localNetworkID
-            remoteClaimStatus.localNetworkID, // @property remoteNetworkID
-            ourIdentity, // @property recipient
-            lenderCert,
-            true, // @property claimStatus
-            remoteClaimStatus.expiryTimeSecs, // @property expiryTimeSecs
-            false, // @property expirationStatus
-            localPledgeRef.state.data.pledgeCondition
-        )
-        
-        val notary = networkIdStateRef.state.notary
-        val claimCmd = Command(AssetTransferContract.Commands.ClaimRemoteAsset(),
-            listOf(
-                ourIdentity.owningKey
+            val marshalledAsset = getAssetJsonStringFromStatePointer(localPledgeRef.state.data, serviceHub)
+            
+            val assetClaimStatusState = AssetClaimStatusState(
+                pledgeId,
+                // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
+                marshalledAsset, // @property assetDetails
+                fetchedNetworkIdState.networkId, // @property localNetworkID
+                remotePledge.localNetworkID, // @property remoteNetworkID
+                ourIdentity, // @property recipient
+                lenderCert,
+                true, // @property claimStatus
+                remotePledge.expiryTimeSecs, // @property expiryTimeSecs
+                false, // @property expirationStatus
+                localPledgeRef.state.data.pledgeCondition
             )
-        )
-        val assetCreateCmd = Command(AssetContract.Commands.Issue(),
-            setOf(
-                ourIdentity.owningKey,
-                issuer.owningKey
-            ).toList()
-        )
-        
-        val txBuilder = TransactionBuilder(notary)
-            .addInputState(localPledgeRef)
-            .addInputState(remoteClaimStatusRef)
-            .addOutputState(claimAssetState, BondAssetContract.ID)
-            .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
-            .addCommand(claimCmd)
-            .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
-            .addCommand(assetCreateCmd)
-            .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs).plusNanos(1)))
-        
-        // Verify and collect signatures on the transaction
-        txBuilder.verify(serviceHub)
-        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
-        println("Recipient signed transaction.")
+            
+            val notary = networkIdStateRef.state.notary
+            val claimCmd = Command(AssetTransferContract.Commands.ClaimRemoteAsset(),
+                listOf(
+                    ourIdentity.owningKey
+                )
+            )
+            val assetCreateCmd = Command(AssetContract.Commands.Issue(),
+                setOf(
+                    ourIdentity.owningKey,
+                    issuer.owningKey
+                ).toList()
+            )
+            val externalStateConsumeCommand = Command(ExternalStateContract.Commands.Consume(), 
+                remotePledgeRef.state.data.participants.map { it.owningKey }
+            )
+            
+            val txBuilder = TransactionBuilder(notary)
+                .addReferenceState(ReferencedStateAndRef(localPledgeRef))
+                .addInputState(remotePledgeRef)
+                .addOutputState(claimAssetState, AssetContract.ID)
+                .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
+                .addCommand(claimCmd)
+                .addCommand(externalStateConsumeCommand)
+                .addCommand(assetCreateCmd)
+                .addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                .setTimeWindow(TimeWindow.untilOnly(Instant.ofEpochSecond(localPledgeRef.state.data.expiryTimeSecs)))
+            
+            // Verify and collect signatures on the transaction
+            txBuilder.verify(serviceHub)
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            println("Recipient signed transaction.")
 
-        var sessions = listOf<FlowSession>()
+            var sessions = listOf<FlowSession>()
 
-        if (!ourIdentity.equals(issuer)) {
-            val issuerSession = initiateFlow(issuer)
-            issuerSession.send(AssetLoanResponderRole.SIGNER)
-            sessions += issuerSession
+            if (!ourIdentity.equals(issuer)) {
+                val issuerSession = initiateFlow(issuer)
+                issuerSession.send(AssetLoanResponderRole.SIGNER)
+                sessions += issuerSession
+            }
+
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            
+            var observerSessions = listOf<FlowSession>()
+            val lockerSession = initiateFlow(localPledgeRef.state.data.locker)
+            lockerSession.send(AssetLoanResponderRole.OBSERVER)
+            observerSessions += lockerSession
+
+            for (obs in observers) {
+                val obsSession = initiateFlow(obs)
+                obsSession.send(AssetLoanResponderRole.OBSERVER)
+                observerSessions += obsSession
+            }
+            Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
         }
-
-        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
-        
-        var observerSessions = listOf<FlowSession>()
-        val lockerSession = initiateFlow(localPledgeRef.state.data.locker)
-        lockerSession.send(AssetLoanResponderRole.OBSERVER)
-        observerSessions += lockerSession
-
-        for (obs in observers) {
-            val obsSession = initiateFlow(obs)
-            obsSession.send(AssetLoanResponderRole.OBSERVER)
-            observerSessions += obsSession
-        }
-        Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
     } catch (e: Exception) {
         println("Error in claiming the loaned asset: ${e.message}\n")
         Left(Error("Failed to claim loaned asset: ${e.message}"))
@@ -687,11 +708,11 @@ class ClaimLoanRepaymentAcceptor(val session: FlowSession) : FlowLogic<SignedTra
             val signTransactionFlow = object : SignTransactionFlow(session) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val tx = stx.tx.toLedgerTransaction(serviceHub)
-                    "There should be one input AssetPledgeState." using (tx.inputsOfType<AssetPledgeState>().size == 1)
+                    "There should be one reference AssetPledgeState." using (tx.referenceInputRefsOfType<AssetPledgeState>().size == 1)
                     "One output state only should be created." using (tx.outputsOfType<AssetState>().size == 1)
-                    val pledgeState = tx.inputsOfType<AssetPledgeState>()[0]
+                    val pledgeState = tx.referenceInputRefsOfType<AssetPledgeState>()[0].state.data
                     val assetState = tx.outputsOfType<AssetState>()[0]
-                    val remoteClaimStatus = parseExternalStateForClaimStatus(
+                    val remotePledge = parseExternalStateForPledgeStatus(
                         tx.inputsOfType<ExternalState>()[0]
                     )
                     
@@ -699,10 +720,10 @@ class ClaimLoanRepaymentAcceptor(val session: FlowSession) : FlowLogic<SignedTra
                     * - if repayment amount is correct
                     * - repayment is for correct asset id
                     * - output loaned asset state is same as the one in input pledge state
-                    * - output loaned asset state is same as asset in claim status
+                    * - output loaned asset state is same as asset in output claim status
                     */
                     
-                    val assetPledged = pledgeState.assetStatePointer!!.resolve(tx).state.data as AssetState
+                    val assetPledged = pledgeState.assetStatePointer!!.resolve(serviceHub).state.data as AssetState
                     
                     "Asset pledged and output asset should be same" using (assetState.quantity == assetPledged.quantity
                         && assetState.tokenType == assetPledged.tokenType
@@ -717,14 +738,20 @@ class ClaimLoanRepaymentAcceptor(val session: FlowSession) : FlowLogic<SignedTra
                     
                     // Here assuming that when pledges were created 
                     // it was verified that correct asset is present in pledgeCondition
-                    val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
-                    val remotePledgeCondition = Gson().fromJson(remoteClaimStatus.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
-                    "Pledge condition on both pledges should match" using (pledgeCondition == remotePledgeCondition)
+                    val pledgeConditionFromTokenLedger = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                    val pledgeConditionFromAssetLedger = Gson().fromJson(remotePledge.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
+                    "Pledge condition on both pledges should match" using (pledgeConditionFromTokenLedger == pledgeConditionFromAssetLedger)
                     
-                    val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.recipient!!, serviceHub)).toByteArray())
-                    val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
+                    val lenderCert = pledgeState.recipientCert
+                    val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
                     
-                    "Borrower and Lender parties of Token in pledgeCondition should be correct" using (remotePledgeCondition.tokenLedgerLenderCert == lenderCert && remotePledgeCondition.tokenLedgerBorrowerCert == borrowerCert)
+                    "Borrower and Lender parties of Token in pledgeCondition should be correct" using (pledgeConditionFromAssetLedger.tokenLedgerLenderCert == lenderCert && pledgeConditionFromAssetLedger.tokenLedgerBorrowerCert == borrowerCert)
+                    
+                    val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                    "There should be a single reference input network id." using (inReferences.size == 1)
+
+                    val validNetworkIdState = inReferences.get(0).state.data
+                    "Asset ledger should be correct in asset pledge condition." using (pledgeConditionFromAssetLedger.tokenLedgerId.equals(validNetworkIdState.networkId))
                 }
             }
             try {
@@ -762,7 +789,7 @@ class ReclaimPledgedLoanedAssetInitiator
 @JvmOverloads
 constructor(
     val pledgeId: String,
-    val claimStatusLinearId: String,
+    val claimStatusLinearIds: Array<UniqueIdentifier>,
     val issuer: Party,
     val observers: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -776,8 +803,8 @@ constructor(
     override fun call(): Either<Error, SignedTransaction> = try {
         val linearId = getLinearIdFromString(pledgeId)
 
-        val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearId))
-        val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
+        val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearIds[0]))
+        val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearIds[0].toString()))
         val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
         val payloadDecoded = Base64.getDecoder().decode(externalStateView.notarizedPayloadsList[0].payload.toByteArray())
         val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(payloadDecoded)

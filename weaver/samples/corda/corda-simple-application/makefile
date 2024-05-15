@@ -77,9 +77,28 @@ initialise-vault-asset-transfer:
 		./clients/build/install/clients/bin/clients configure network; \
 	fi
 	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
-		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network; \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network ; \
 	fi
 	bash scripts/initNetworkId.sh
+
+.PHONY: initialise-vault-asset-loan
+initialise-vault-asset-loan: gen-asset-loan-policies
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
+	fi
+	bash scripts/initNetworkId.sh
+
+.PHONY: gen-asset-loan-policies
+gen-asset-loan-policies:
+	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
+		LOCAL_FLOW="localhost:10006;localhost:10012#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="localhost:30006;localhost:30009#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyC" ./clients/build/install/clients/bin/clients configure create-all; \
+	fi
+	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
+		NETWORK_NAME=Corda_Network2 LOCAL_FLOW="localhost:30006;localhost:30009#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="localhost:10006;localhost:10012#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyB" ./clients/build/install/clients/bin/clients configure create-all; \
+	fi
 
 .PHONY: initialise-vault-asset-transfer-docker
 initialise-vault-asset-transfer-docker:
