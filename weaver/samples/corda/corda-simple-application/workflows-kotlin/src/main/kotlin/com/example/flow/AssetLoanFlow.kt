@@ -175,7 +175,7 @@ constructor(
                     assetExchangeHTLCState.assetStatePointer, // @property assetStatePointer
                     ourIdentity, // @property locker
                     pledgeCondition.assetLedgerLenderCert, // @property lockerCert
-                    pledgeCondition.assetLedgerBorrowerCert, // @property recipientCert
+                    pledgeCondition.tokenLedgerLenderCert, // @property recipientCert
                     loanPeriodAbs.getEpochSecond(),
                     pledgeCondition.assetLedgerId,
                     pledgeCondition.tokenLedgerId,
@@ -254,7 +254,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     )
                     
                     "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
-                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerBorrowerCert)
+                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerLenderCert)
                     
                     val inReferences = lTx.referenceInputRefsOfType<NetworkIdState>()
                     "There should be a single reference input network id." using (inReferences.size == 1)
@@ -289,7 +289,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     )
                     
                     "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
-                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.assetLedgerBorrowerCert)
+                    "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerLenderCert)
                     
                     val inReferences = lTx.referenceInputRefsOfType<NetworkIdState>()
                     "There should be a single reference input network id." using (inReferences.size == 1)
@@ -301,7 +301,7 @@ class ClaimAndPledgeAssetStateAcceptor(val session: FlowSession) : FlowLogic<Sig
                     val myCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
                     
                     "I should be the locker of HTLC state" using (htlcStates[0].locker == ourIdentity) 
-                    "I should be the recipient of pledge" using (pledgeState.recipient == ourIdentity && pledgeState.recipientCert == myCert)
+                    "I should be the recipient of pledge" using (pledgeState.recipient == ourIdentity)
                     "I should be the borrower of pledge condition" using (pledgeCondition.assetLedgerBorrowerCert == myCert)
                 }
             }
@@ -523,7 +523,8 @@ class ClaimLoanedAssetAcceptor(val session: FlowSession) : FlowLogic<SignedTrans
                     "Pledge condition on both pledges should match" using (pledgeConditionFromAssetLedger == pledgeConditionFromTokenLedger)
                     
                     val lenderCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
-                    val borrowerCert = pledgeState.recipientCert
+                    val borrowerCert = pledgeConditionFromAssetLedger.assetLedgerBorrowerCert
+                    //val borrowerCert = pledgeState.recipientCert
                     
                     "Borrower and Lender parties of Asset in pledgeCondition should be correct" using (pledgeConditionFromTokenLedger.assetLedgerLenderCert == lenderCert && pledgeConditionFromTokenLedger.assetLedgerBorrowerCert == borrowerCert)
                     
@@ -606,6 +607,8 @@ constructor(
         val borrower = localPledgeRef.state.data.locker
         val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(borrower, serviceHub)).toByteArray())
         
+        println("from Asset Ledger: $pledgeConditionFromAssetLedger\n") 
+        println("from Token Ledger: $pledgeConditionFromTokenLedger\n")
         
         if (pledgeConditionFromAssetLedger != pledgeConditionFromTokenLedger) {
             println("Repayment condition doesn't match in asset and token pledges")
@@ -742,7 +745,8 @@ class ClaimLoanRepaymentAcceptor(val session: FlowSession) : FlowLogic<SignedTra
                     val pledgeConditionFromAssetLedger = Gson().fromJson(remotePledge.pledgeCondition.toStringUtf8(), LoanRepaymentCondition::class.java)
                     "Pledge condition on both pledges should match" using (pledgeConditionFromTokenLedger == pledgeConditionFromAssetLedger)
                     
-                    val lenderCert = pledgeState.recipientCert
+                    //val lenderCert = pledgeState.recipientCert
+                    val lenderCert = pledgeConditionFromTokenLedger.tokenLedgerLenderCert
                     val borrowerCert = Base64.getEncoder().encodeToString(x509CertToPem(getPartyCertificate(pledgeState.locker, serviceHub)).toByteArray())
                     
                     "Borrower and Lender parties of Token in pledgeCondition should be correct" using (pledgeConditionFromAssetLedger.tokenLedgerLenderCert == lenderCert && pledgeConditionFromAssetLedger.tokenLedgerBorrowerCert == borrowerCert)

@@ -220,7 +220,7 @@ object AssetLoanManager {
                         asset_ledger!!,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        lenderCert,
+                        assetLedgerBorrowerCert,
                         nTimeout,
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
                         AssetContract.Commands.LoanPledge(),
@@ -255,7 +255,6 @@ object AssetLoanManager {
         val config by requireObject<Map<String, String>>()
         val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset loan pledge state")
         val remotePledgeId: String? by option("-rpid", "--remote-pledge-id", help="Pledge id for token pledged state")
-        val lender: String? by option("-l", "--lender", help="X500 name for lender Party in this asset ledger")
         val assetRelayAddress: String? by option ("-ar", "--asset-relay", help="This (asset) ledger relay address")
         val tokenLedgerType: String? by option("-tlt", "--token-ledger-type", help="DLT type of remote network: fabric|corda|besu")
         val tokenLedgerId: String? by option("-tlid", "--token-ledger-id", help="Ledger id for token network")
@@ -263,11 +262,10 @@ object AssetLoanManager {
         override fun run() = runBlocking {
             if (pledgeId == null ||
                 remotePledgeId == null ||
-                lender == null ||
                 assetRelayAddress == null ||
                 tokenLedgerType == null ||
                 tokenLedgerId == null) {
-                println("Arguments required: --pledge-id, --remote-pledge-id, --lender, --asset-ledger-id, --token-ledger-id, --token-ledger-type, and --asset-relay.")
+                println("Arguments required: --pledge-id, --remote-pledge-id, --asset-ledger-id, --token-ledger-id, --token-ledger-type, and --asset-relay.")
             } else {
                 val rpc = NodeRPCConnection(
                         host = config["CORDA_HOST"]!!,
@@ -294,17 +292,19 @@ object AssetLoanManager {
                         obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                     }
 
+                    val loanRepaymentCondition = Gson().fromJson(ByteString.copyFrom(assetPledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+
                     // Obtain the locker certificate from the name of the locker
-                    val assetLedgerLenderCert = assetPledgeState.lockerCert
-                    val tokenLedgerBorrowerCert = assetPledgeState.recipientCert
+                    val assetLedgerBorrowerCert = fetchCertBase64Helper(rpc.proxy) // my cert: borrower
+                    val tokenLedgerBorrowerCert = loanRepaymentCondition.tokenLedgerBorrowerCert 
 
                     var externalStateAddress: String = getClaimLoanedAssetViewAddress(
                         tokenLedgerType!!, 
                         remotePledgeId!!, 
                         assetPledgeState.localNetworkId, 
                         assetPledgeState.remoteNetworkId, 
-                        assetLedgerLenderCert, 
-                        tokenLedgerBorrowerCert
+                        tokenLedgerBorrowerCert,
+                        assetLedgerBorrowerCert 
                     )
 
                     // 1. While exercising 'data transfer' initiated by a Corda network, the localRelayAddress is obtained directly from user.
@@ -313,7 +313,6 @@ object AssetLoanManager {
                     //    below from the remote-network-config.json file
                     //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
                     //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                    //val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(assetRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
                     
                     val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
                     val replaceIndex = 1
@@ -328,17 +327,6 @@ object AssetLoanManager {
                         listOf(issuer)
                     ) 
 
-                    /*val result = runCatching {
-                        rpc.proxy.startFlow(::ClaimLoanedAssetInitiator, pledgeId!!, pledgeStatusLinearId, issuer, obs)
-                            .returnValue.get()
-                    }.fold({ it ->
-                        it.map { pledgeId ->
-                            println("Claim loaned asset was successful and claim status was stored with id $pledgeId.\n")
-                            pledgeId.toString()
-                        }
-                    }, { it -> 
-                        println("Corda Network Error: Error running ClaimLoanedAsset flow: ${it.message}\n")
-                    })*/
                     println("Loaned asset claim by borrower successful")
                 } catch (e: Exception) {
                     println("Error: ${e.toString()}")
@@ -358,7 +346,6 @@ object AssetLoanManager {
         val config by requireObject<Map<String, String>>()
         val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset loan pledge state")
         val remotePledgeId: String? by option("-rpid", "--remote-pledge-id", help="Pledge id for token pledged state")
-        val borrower: String? by option("-b", "--borrower", help="X500 name for borrower Party in this asset ledger")
         val tokenRelayAddress: String? by option ("-tr", "--token-relay", help="This (token) ledger relay address")
         val assetLedgerType: String? by option("-alt", "--asset-ledger-type", help="DLT type of remote network: fabric|corda|besu")
         val assetLedgerId: String? by option("-alid", "--asset-ledger-id", help="Ledger ID for asset network")
@@ -366,11 +353,10 @@ object AssetLoanManager {
         override fun run() = runBlocking {
             if (pledgeId == null ||
                 remotePledgeId == null ||
-                borrower == null ||
                 tokenRelayAddress == null ||
                 assetLedgerType == null ||
                 assetLedgerId == null) {
-                println("Arguments required: --pledge-id, --remote-pledge-id, --borrower, --token-ledger-id, --asset-ledger-id, --asset-ledger-type, and --asset-relay.")
+                println("Arguments required: --pledge-id, --remote-pledge-id, --token-ledger-id, --asset-ledger-id, --asset-ledger-type, and --asset-relay.")
             } else {
                 val rpc = NodeRPCConnection(
                         host = config["CORDA_HOST"]!!,
@@ -397,24 +383,19 @@ object AssetLoanManager {
                         obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                     }
 
-                    // Obtain the locker certificate from the name of the locker
-                    val tokenLedgerBorrowerCert = assetPledgeState.lockerCert
-                    val assetLedgerLenderCert = assetPledgeState.recipientCert
-                    //val lenderCert: String = getUserCertFromFile(lender!!, tokenLedgerId!!)
-                    val borrower = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(borrower!!))!!
+                    val loanRepaymentCondition = Gson().fromJson(ByteString.copyFrom(assetPledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
 
-                    val pledgeCondition = Gson().fromJson(ByteString.copyFrom(assetPledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                    // Obtain the locker certificate from the name of the locker
+                    val assetLedgerBorrowerCert: String = loanRepaymentCondition.assetLedgerBorrowerCert
+                    val tokenLedgerLenderCert = fetchCertBase64Helper(rpc.proxy) // myCert: lender
 
                     var externalStateAddress: String = getClaimRepaymentViewAddress(
                         assetLedgerType!!, 
                         remotePledgeId!!, 
-                        assetPledgeState.expiryTimeSecs.toString(), 
                         assetPledgeState.localNetworkId, 
                         assetPledgeState.remoteNetworkId,
-                        pledgeCondition.assetType,
-                        pledgeCondition.assetId,
-                        tokenLedgerBorrowerCert, 
-                        assetLedgerLenderCert
+                        assetLedgerBorrowerCert, 
+                        tokenLedgerLenderCert
                     )
 
                     // 1. While exercising 'data transfer' initiated by a Corda network, the localRelayAddress is obtained directly from user.
@@ -423,7 +404,6 @@ object AssetLoanManager {
                     //    below from the remote-network-config.json file
                     //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
                     //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                    //val claimStatusLinearId: String = requestStateFromRemoteNetwork(tokenRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
 
                     val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
                     val replaceIndex = 1
@@ -437,18 +417,6 @@ object AssetLoanManager {
                         config,
                         listOf(issuer)
                     ) 
-                    /*
-                    val result = runCatching {
-                        rpc.proxy.startFlow(::ClaimLoanRepaymentInitiator, pledgeId!!, claimStatusLinearId, issuer, obs)
-                            .returnValue.get()
-                    }.fold({ it ->
-                        it.map { pledgeId ->
-                            println("Claim loan repayment was successful and claim status was stored with id $pledgeId.\n")
-                            pledgeId.toString()
-                        }
-                    }, { it -> 
-                        println("Corda Network Error: Error running ClaimLoanRepaymentInitiator flow: ${it.message}\n")
-                    })*/
                     println("Loan repayment claim by lender response")
                 } catch (e: Exception) {
                     println("Error: ${e.toString()}")
@@ -462,26 +430,24 @@ object AssetLoanManager {
     }
 }
 
-fun getClaimLoanedAssetViewAddress(tokenLedgerType: String, remotePledgeId: String, localNetworkId: String, remoteNetworkId: String, assetLenderCert: String?, tokenBorrowerCert: String?): String {
-    // assetLenderCert -> locker
-    // tokenBorrowerCert -> recipient
+fun getClaimLoanedAssetViewAddress(tokenLedgerType: String, remotePledgeId: String, localNetworkId: String, remoteNetworkId: String, ownerCert: String?, recipientCert: String?): String {
+    // tokenBorrowerCert -> owner
+    // assetBorrowerCert -> recipient
     if (tokenLedgerType.equals("corda")) {
         return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetAssetPledgeStatusByPledgeId", listOf(remotePledgeId, localNetworkId))
     } else if (tokenLedgerType.equals("fabric")) {
-        throw Error("Unsupported ledger type: ${tokenLedgerType}")
-        //return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetAssetPledgeStatus", listOf(remotePledgeId, assetLenderCert!!, localNetworkId, tokenBorrowerCert!!))
+        return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetTokenAssetPledgeStatus", listOf(remotePledgeId, ownerCert!!, localNetworkId, recipientCert!!))
     } else {
         throw Error("Unsupported ledger type: ${tokenLedgerType}")
     }
 }
-fun getClaimRepaymentViewAddress(assetLedgerType: String, remotePledgeId: String, expiryTimeSecs: String, localNetworkId: String, remoteNetworkId: String, assetType: String?, assetId: String?, tokenBorrowerCert: String?, assetLenderCert: String?): String {
-    // tokenBorrowerCert -> locker
-    // assetLenderCert -> recipient
+fun getClaimRepaymentViewAddress(assetLedgerType: String, remotePledgeId: String, localNetworkId: String, remoteNetworkId: String, ownerCert: String?, recipientCert: String?): String {
+    // assetBorrowerCert -> owner
+    // tokenLenderCert -> recipient
     if (assetLedgerType.equals("corda")) {
         return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetBondAssetPledgeStatusByPledgeId", listOf(remotePledgeId, localNetworkId))
     } else if (assetLedgerType.equals("fabric")) {
-        throw Error("Unsupported ledger type: ${assetLedgerType}")
-        //return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetAssetClaimStatus", listOf(remotePledgeId, assetType!!, assetId!!, assetLenderCert!!, tokenBorrowerCert!!, remoteNetworkId, expiryTimeSecs))
+        return generateViewAddressFromRemoteConfig(remoteNetworkId, "GetAssetPledgeStatus", listOf(remotePledgeId, ownerCert!!, localNetworkId, recipientCert!!))
     } else {
         throw Error("Unsupported ledger type: ${assetLedgerType}")
     }

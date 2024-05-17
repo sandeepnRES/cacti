@@ -42,10 +42,10 @@ echo "Tokens pledge ID: $PID2"
 if [ -z "${PID2}" ]; then exit 1; fi
 
 # Step 7
-CORDA_PORT=10009 ./clients/build/install/clients/bin/clients loan claim-asset -pid $PID1 -rpid $PID2 -l 'O=PartyC, L=London, C=GB' -ar 'localhost:9081' -tlt 'corda' -tlid 'Corda_Network2' 1> tmp.out
+CORDA_PORT=10009 ./clients/build/install/clients/bin/clients loan claim-asset -pid $PID1 -rpid $PID2 -ar 'localhost:9081' -tlt 'corda' -tlid 'Corda_Network2' 1> tmp.out
 cat tmp.out
 (cat tmp.out | grep "Loaned asset claim by borrower successful" ) || exit 1
 
 # Step 8
-NETWORK_NAME=Corda_Network2 CORDA_PORT=30012 ./clients/build/install/clients/bin/clients loan claim-repayment -pid $PID2 -rpid $PID1 -b 'O=PartyB, L=London, C=GB' -tr 'localhost:9082' -alt 'corda' -alid 'Corda_Network' 1> tmp.out
+NETWORK_NAME=Corda_Network2 CORDA_PORT=30012 ./clients/build/install/clients/bin/clients loan claim-repayment -pid $PID2 -rpid $PID1 -tr 'localhost:9082' -alt 'corda' -alid 'Corda_Network' 1> tmp.out
 cat tmp.out
