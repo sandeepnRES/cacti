@@ -22,7 +22,7 @@ do
     echo $CID2
 
     ./bin/fabric-cli asset loan claim --fungible --recipient=$borrower --target-network=network2 --contract-id=$CID2 --secret=secrettext
-    ./bin/fabric-cli asset loan claim-and-pledge --asset-network=network1 --token-network=network2 --lender=$lender --borrower=$borrower --secret=secrettext --contract-id=$CID --loan-period=${loanperiod} --loan-token-type=token1 --loan-amount=${tokenamt} &> tmp.out
+    ./bin/fabric-cli asset loan claim-and-pledge --asset-network=network1 --token-network=network2 --lender=$lender --token-lender=$lender --token-borrower=$borrower --secret=secrettext --contract-id=$CID --loan-period=${loanperiod} --loan-token-type=token1 --loan-amount=${tokenamt} &> tmp.out
     cat tmp.out
     PID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
     echo $PID
@@ -32,9 +32,9 @@ do
     PID2=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
     echo $PID2
 
-    ./bin/fabric-cli asset loan claim-asset --token-network=network2 --asset-network=network1 --borrower=$borrower --lender=$lender --type=bond --pledge-id=$PID --token-pledge-id=$PID2
+    ./bin/fabric-cli asset loan claim-asset --token-network=network2 --asset-network=network1 --borrower=$borrower --token-borrower=$borrower --token-ledger-type=fabric --pledge-id=$PID --token-pledge-id=$PID2
 
-    ./bin/fabric-cli asset loan claim-repayment --token-network=network2 --asset-network=network1 --borrower=$borrower --lender=$lender --type=bond --pledge-id=$PID2 --asset-pledge-id=$PID
+    ./bin/fabric-cli asset loan claim-repayment --token-network=network2 --asset-network=network1 --token-borrower=$borrower --lender=$lender --asset-ledger-type=fabric --pledge-id=$PID2 --asset-pledge-id=$PID
     
 done
     #echo "./bin/fabric-cli asset loan claim-repayment --token-network=network2 --asset-network=network1 --borrower=$borrower --lender=$lender --type=bond --pledge-id=$PID2 --asset-pledge-id=$PID --loan-period=${loanperiod}"

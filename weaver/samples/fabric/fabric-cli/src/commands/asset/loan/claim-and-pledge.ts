@@ -76,7 +76,12 @@ const command: GluegunCommand = {
               'Lender name'
           },
           {
-            name: '--borrower',
+            name: '--token-lender',
+            description:
+              'Borrower name'
+          },
+          {
+            name: '--token-borrower',
             description:
               'Borrower name'
           },
@@ -116,9 +121,13 @@ const command: GluegunCommand = {
       print.error('--lender needs to be specified')
       return
     }
-    if (!options['borrower'])
+    if (!options['token-lender'])
     {
-      print.error('--borrower needs to be specified')
+        options['token-lender'] = options['lender']
+    }
+    if (!options['token-borrower'])
+    {
+      print.error('--token-borrower needs to be specified')
       return
     }
     if (!options['loan-period'])
@@ -167,7 +176,8 @@ const command: GluegunCommand = {
         contractId: options['contract-id'],
         hash: hash,
         lender: options['lender'],
-        borrower: options['borrower'],
+        tokenLender: options['token-lender'],
+        tokenBorrower: options['token-borrower'],
         loanPeriod: options['loanPeriod'],
         repaymentAmount: options['loan-amount'],
         repaymentTokenType: options['loan-token-type'],
@@ -185,6 +195,7 @@ const command: GluegunCommand = {
   }
 }
 
+/*
 async function subscribeDelete(user, networkName, pledgeId, netConfig) {
     const data = JSON.parse(`{   
         "event_matcher": {
@@ -244,6 +255,6 @@ async function subscribeDelete(user, networkName, pledgeId, netConfig) {
         console.log("Error: ", e.toString())
     }
 
-}
+}*/
 
 module.exports = command

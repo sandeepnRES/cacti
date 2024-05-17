@@ -41,8 +41,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli asset loan claim-repayment --token-network=network1 --asset-network=network2 --borrower=alice --type=bond --pledge-id="pledgeid" --param=bond01:a03\r\nfabric-cli asset loan claim-repayment --token-network=network1 --asset-network=network2 --borrower=alice --type=token --param=token1:50',
-        'fabric-cli asset loan claim-repayment --token-network=<token-network-name> --asset-network=<asset-network-name> --borrower=<borrower-id> --type=<bond|token> --pledge-id=<pledge-id> --param=<asset-type>:<asset-id|num-units>',
+        'fabric-cli asset loan claim-repayment --token-network=network1 --asset-network=network2 --token-borrower=alice --asset-ledger-type=bond --pledge-id="pledgeid" --param=bond01:a03\r\nfabric-cli asset loan claim-repayment --token-network=network1 --asset-network=network2 --token-borrower=alice --asset-ledger-type=token --param=token1:50',
+        'fabric-cli asset loan claim-repayment --token-network=<token-network-name> --asset-network=<asset-network-name> --token-borrower=<token-borrower-id> --asset-ledger-type=<bond|token> --pledge-id=<pledge-id> --param=<asset-type>:<asset-id|num-units>',
         [
           {
             name: '--debug',
@@ -65,9 +65,9 @@ const command: GluegunCommand = {
               'Lender name'
           },
           {
-            name: '--borrower',
+            name: '--token-borrower',
             description:
-              'Borrower name'
+              'Token ledger Borrower name'
           },
           {
             name: '--pledge-id',
@@ -117,17 +117,17 @@ const command: GluegunCommand = {
       print.error('--lender needs to be specified')
       return
     }
-    if (!options['borrower'])
+    if (!options['token-borrower'])
     {
-      print.error('--borrower needs to be specified')
+      print.error('--token-borrower needs to be specified')
       return
     }
-    if (!options['type'])
+    if (!options['asset-ledger-type'])
     {
-      print.error('--type of asset loan needs to be specified in the format: \'asset_type.remote_network_type\'.' +
-            ' \'asset_type\' can be either \'bond\', \'token\' or \'house-token\'.' +
-            ' \'remote_network_type\' can be either \'fabric\', \'corda\' or \'besu\'.')
-      return
+      options['asset-ledger-type'] = 'fabric'
+      print.info('--asset-ledger-type of asset loan needs to be specified in the format: \'asset-ledger-type\'.' +
+            ' \'asset-ledger-type\' can be either \'fabric\', \'corda\' or \'besu\'.' +
+            '\nDefault: fabric')
     }
     if (!options['pledge-id'])
     {
@@ -148,7 +148,7 @@ const command: GluegunCommand = {
       )
       return
     }
-    const transferCategory = 'bond.fabric'
+    const transferCategory = 'bond.' + options['asset-ledger-type']
     
     try {
       /*const loanRepaymentCondition = await getLoanRepaymentCondition({
@@ -162,7 +162,7 @@ const command: GluegunCommand = {
       
       const lenderCert = await getUserCertBase64(options['token-network'], options['lender'])
       const { viewAddress, ownerCert } = await getClaimViewAddress(transferCategory, 
-        options['asset-pledge-id'], options['borrower'], options["asset-network"], 
+        options['asset-pledge-id'], options['token-borrower'], options["asset-network"], 
         lenderCert, options["token-network"]
       )
       
