@@ -276,7 +276,7 @@ const generateAccessControl = async (
   const credentialsPath = getCurrentNetworkCredentialPath(networkName);
   fs.writeFileSync(
     path.join(credentialsPath, `access-control.json`),
-    JSON.stringify(accessControlJSON),
+    JSON.stringify(accessControlJSON, null, 2),
   );
 };
 
@@ -318,7 +318,7 @@ const generateVerificationPolicy = async (
   logger.debug("Credential Path", credentialsPath);
   fs.writeFileSync(
     path.join(credentialsPath, `verification-policy.json`),
-    JSON.stringify(verificationPolicy),
+    JSON.stringify(verificationPolicy, null, 2),
   );
 };
 
@@ -343,7 +343,7 @@ const generateMembership = async (
   const network = await gateway.getNetwork(channel);
   const mspConfig = await getMspConfig(network, logger);
   const membershipJSON = formatMSP(mspConfig, networkName);
-  const membershipJSONStr = JSON.stringify(membershipJSON);
+  const membershipJSONStr = JSON.stringify(membershipJSON, null, 2);
   logger.debug(`membershipJSON: ${membershipJSONStr}`);
 
   const credentialsPath = getCurrentNetworkCredentialPath(networkName);

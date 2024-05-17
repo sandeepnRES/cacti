@@ -28,7 +28,8 @@ const claimAndPledgeAsset = async ({
     contractId,
     hash,
     lender,
-    borrower,
+    tokenLender,
+    tokenBorrower,
     loanPeriod,
     repaymentAmount,
     repaymentTokenType,
@@ -43,7 +44,8 @@ const claimAndPledgeAsset = async ({
     contractId: string
     hash: HashFunctions
     lender: string
-    borrower: string
+    tokenLender: string
+    tokenBorrower: string
     loanPeriod: number
     repaymentAmount: number
     repaymentTokenType: string
@@ -63,8 +65,8 @@ const claimAndPledgeAsset = async ({
         userString: lender,
         registerUser: false
     })
-    const lenderTokenCert = getUserCertFromFile(lender, tokenNetworkName)
-    const borrowerTokenCert = getUserCertFromFile(borrower, tokenNetworkName)
+    const lenderTokenCert = getUserCertFromFile(tokenLender, tokenNetworkName)
+    const borrowerTokenCert = getUserCertFromFile(tokenBorrower, tokenNetworkName)
     const expirationTime = (Math.floor(Date.now()/1000 + loanPeriod)).toString()
     
     const loanRepaymentConditionJSON = {
@@ -77,7 +79,7 @@ const claimAndPledgeAsset = async ({
     	assetId: "",
     	assetLedgerId: "",
     	assetLedgerLenderCert: "",
-    	assetLedgerBorrowerCertsuer: ""
+    	assetLedgerBorrowerCert: ""
     }
     const loanRepaymentConditionJSONStr = JSON.stringify(loanRepaymentConditionJSON)
 

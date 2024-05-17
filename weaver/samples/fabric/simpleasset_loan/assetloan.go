@@ -40,7 +40,7 @@ type LoanRepaymentCondition struct {
 	AssetId           			string    `json:"assetId"`
 	AssetLedgerId        		string    `json:"assetLedgerId"`
 	AssetLedgerLenderCert       string    `json:"assetLedgerLenderCert"`
-	AssetLedgerBorrowerCert     string    `json:"assetLedgerBorrowerCertsuer"`
+	AssetLedgerBorrowerCert     string    `json:"assetLedgerBorrowerCert"`
 }
 
 // Step 5: First HTLC claim and then Pledge

@@ -42,8 +42,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli asset loan claim-asset --token-network=network2 --asset-network=network1 --borrower=alice --lender=bob --type=bond --pledge-id="<pledgeid>" --token-pledge-id="<token-pledge-id>"',
-        'fabric-cli asset loan claim-asset --token-network=<token-network-name> --asset-network=<asset-network-name> --borrower=<borrower-id> --type=<bond|token> --pledge-id=<pledge-id> --param=<asset-type>:<asset-id|num-units>',
+        'fabric-cli asset loan claim-asset --token-network=network2 --asset-network=network1 --borrower=alice --token-ledger-type=bond --pledge-id="<pledgeid>" --token-pledge-id="<token-pledge-id>"',
+        'fabric-cli asset loan claim-asset --token-network=<token-network-name> --asset-network=<asset-network-name> --borrower=<borrower-id> --token-ledger-type=<bond|token> --pledge-id=<pledge-id> --param=<asset-type>:<asset-id|num-units>',
         [
           {
             name: '--debug',
@@ -61,15 +61,21 @@ const command: GluegunCommand = {
               'Network where the asset is to be transferred. <network1|network2>'
           },
           {
-            name: '--lender',
-            description:
-              'Lender name'
-          },
-          {
             name: '--borrower',
             description:
               'Borrower name'
           },
+          {
+            name: '--token-borrower',
+            description:
+              'Token ledger Borrower name'
+          },
+          {
+            name: '--transfer-category',
+            description:
+              'Transfer category: <bond|token>.<corda|fabric>'
+          },
+        
           {
             name: '--pledge-id',
             description:
@@ -113,22 +119,21 @@ const command: GluegunCommand = {
       print.error('--token-network needs to be specified')
       return
     }
-    if (!options['lender'])
+    if (!options['token-borrower'])
     {
-      print.error('--lender needs to be specified')
-      return
+        options['token-borrower'] = options['borrower']
     }
     if (!options['borrower'])
     {
       print.error('--borrower needs to be specified')
       return
     }
-    if (!options['type'])
+    if (!options['token-ledger-type'])
     {
-      print.error('--type of asset loan needs to be specified in the format: \'asset_type.remote_network_type\'.' +
-            ' \'asset_type\' can be either \'bond\', \'token\' or \'house-token\'.' +
-            ' \'remote_network_type\' can be either \'fabric\', \'corda\' or \'besu\'.')
-      return
+      options['token-ledger-type'] = 'fabric'
+      print.info('--token-ledger-type of asset loan needs to be specified in the format: \'token-ledger-type\'.' +
+            ' \'token-ledger-type\' can be either \'fabric\', \'corda\' or \'besu\'.' +
+            '\nDefault: fabric')
     }
     if (!options['pledge-id'])
     {
@@ -149,12 +154,12 @@ const command: GluegunCommand = {
       )
       return
     }
-    const transferCategory = 'token.fabric'
+    const transferCategory = 'token.' + options['token-ledger-type']
     
     try {
       const borrowerCert = await getUserCertBase64(options['asset-network'], options['borrower'])
       const { viewAddress, ownerCert } = await getClaimViewAddress(transferCategory, options['token-pledge-id'],
-        options['borrower'], options['token-network'], borrowerCert, options['asset-network']
+        options['token-borrower'], options['token-network'], borrowerCert, options['asset-network']
       )
       
       const applicationFunction = 'ClaimLoanedAsset'
