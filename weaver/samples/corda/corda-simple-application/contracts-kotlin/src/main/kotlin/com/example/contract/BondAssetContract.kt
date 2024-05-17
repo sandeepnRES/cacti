@@ -89,7 +89,7 @@ class BondAssetContract : Contract {
                 )
                 
                 "Lender should be the pledger in pledge condition." using (pledgeState.lockerCert == pledgeCondition.assetLedgerLenderCert)
-                "Borrower should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerBorrowerCert)
+                "Token Lender should be the recipient in pledge condition." using (pledgeState.recipientCert == pledgeCondition.tokenLedgerLenderCert)
                 
                 val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
                 "There should be a single reference input network id." using (inReferences.size == 1)
