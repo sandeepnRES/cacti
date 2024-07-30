@@ -1,6 +1,6 @@
 buildscript {
     Properties constants = new Properties()
-    file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
+    file("$projectDir/../../constants.properties").withInputStream { constants.load(it) }
 
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")
@@ -14,7 +14,7 @@ buildscript {
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         tokens_release_group = 'com.r3.corda.lib.tokens'
-        tokens_release_version = '1.2'
+        tokens_release_version = constants.getProperty("cordaTokenSDKVersion")
     }
 
     repositories {
@@ -124,7 +124,7 @@ task deployNodes(type: net.corda.plugins.Cordform) {
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
-    dockerImage = "corda/community:$corda_release_version-zulu-openjdk8"
+    dockerImage = "corda/community:${corda_release_version}-zulu-openjdk8"
     nodeDefaults {
         projectCordapp {
             deploy = false

@@ -1,7 +1,10 @@
+import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+
 buildscript {
-    ext.coroutines_version = "1.8.0"
-    ext.protobuf_version = "4.26.1"
-    ext.grpc_version = "1.63.0" // CURRENT_GRPC_VERSION
+    ext.coroutines_version = "1.8.1"
+    ext.protobuf_version = "3.25.3"
+    ext.grpc_version = "1.65.0" // CURRENT_GRPC_VERSION
     ext.grpc_kotlin_version = "1.4.1" // CURRENT_GRPC_KOTLIN_VERSION
     ext.kotlin_version = "1.9.23"
     
@@ -29,12 +32,21 @@ repositories {
 apply plugin: 'kotlin'
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-    kotlinOptions {
-        languageVersion = "1.9"
-        apiVersion = "1.9"
-        jvmTarget = "17"
+    compilerOptions {
+        languageVersion = KOTLIN_1_9
+        apiVersion = KOTLIN_1_9
+        jvmTarget = JVM_17
         javaParameters = true   // Useful for reflection.
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
 }
 
 jar {
@@ -54,8 +66,8 @@ sourceSets {
 }
 
 dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
@@ -77,7 +89,7 @@ protobuf {
         }
         // Specify protoc to generate using our grpc kotlin plugin
         grpckt {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version:jdk8@jar"
         }
     }
     generateProtoTasks {

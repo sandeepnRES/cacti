@@ -1,5 +1,6 @@
 source:
 	git clone https://github.com/corda/samples-kotlin.git
+	cd samples-kotlin && git checkout cc/dev/ent/4.12
 	mv samples-kotlin/Tokens/fungiblehousetoken source
 	#mv samples-kotlin/Tokens/constants.properties .
 	rm -rf samples-kotlin

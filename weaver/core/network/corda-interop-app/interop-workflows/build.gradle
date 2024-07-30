@@ -1,5 +1,4 @@
 buildscript {
-    ext.protobuf_version = "3.11.1"
     repositories {
         mavenCentral()
     }
@@ -55,8 +54,8 @@ sourceSets {
 }
 
 configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOny
 }
 
 dependencies {
@@ -64,16 +63,17 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.google.code.gson:gson:2.9.1'
 
-    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testCompile "junit:junit:$junit_version"
-    testCompile project(":test-cordapp")
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testImplementation "junit:junit:$junit_version"
+    testImplementation project(":test-cordapp")
 
     implementation "io.arrow-kt:arrow-core:$arrow_version"
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "javax.xml.bind:jaxb-api:$jaxb_version"
 
-    compile "com.google.protobuf:protobuf-java:$protobuf_version"
-    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
+    implementation "com.google.protobuf:protobuf-java:$protobuf_version"
+    implementation "com.google.protobuf:protobuf-java-util:$protobuf_version"
     
     // weaver-protos
     implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
@@ -82,7 +82,9 @@ dependencies {
     cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"
     cordaRuntimeOnly "$corda_release_group:corda:$corda_release_version"
 
-    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+    testImplementation "$corda_release_group:corda-node-driver:$corda_release_version"
+    testImplementation "$corda_core_release_group:corda-test-utils:$corda_core_release_version"
+    testImplementation "$corda_core_release_group:corda-core-test-utils:$corda_core_release_version"
 
     // CorDapp dependencies.
     cordapp project(":interop-contracts")
@@ -115,4 +117,5 @@ publishing {
 
 test {
     maxHeapSize = "4096m"
+    jvmArgs = rootProject.ext.testJvmArgs
 }
