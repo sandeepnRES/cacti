@@ -1,3 +1,6 @@
+import static org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import static org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+
 buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
@@ -17,6 +20,13 @@ buildscript {
         tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
         tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
         clikt_version = constants.getProperty("cliktVersion")
+        
+        coroutines_version = constants.getProperty("coroutinesVersion")
+        bcprov_version = constants.getProperty("bcprovVersion")
+        bcprov_name = constants.getProperty("bcprovName")
+        grpc_version = constants.getProperty("grpcVersion") // CURRENT_GRPC_VERSION
+        grpc_kotlin_version = constants.getProperty("grpcKotlinVersion") // CURRENT_GRPC_KOTLIN_VERSION
+        arrow_version = constants.getProperty("arrowVersion")
     }
 
     repositories {
@@ -81,13 +91,23 @@ allprojects {
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-        kotlinOptions {
-            languageVersion = "1.3"
-            apiVersion = "1.3"
-            jvmTarget = "1.8"
+        compilerOptions {
+            languageVersion = KOTLIN_1_9
+            apiVersion = KOTLIN_1_9
+            jvmTarget = JVM_17
             javaParameters = true   // Useful for reflection.
         }
     }
+    
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    compileJava {
+        options.compilerArgs << '-parameters'
+    }
+
 
     jar {
         // This makes the JAR's SHA-256 hash repeatable.
@@ -108,8 +128,8 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Corda dependencies.
     cordaProvided "$corda_core_release_group:corda-core:$corda_core_release_version"

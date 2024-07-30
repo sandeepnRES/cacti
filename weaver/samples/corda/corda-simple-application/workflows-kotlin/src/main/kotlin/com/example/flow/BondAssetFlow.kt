@@ -26,7 +26,6 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.contracts.requireThat
-import sun.security.x509.UniqueIdentity
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
