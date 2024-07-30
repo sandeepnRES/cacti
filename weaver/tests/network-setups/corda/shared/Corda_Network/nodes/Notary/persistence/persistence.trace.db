@@ -1,10 +1,10 @@
-2024-04-03 10:54:31.951000Z jdbc[3]: exception
+2024-07-30 10:41:49.879434Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "NODE_CHECKPOINTS" not found (this database is empty); SQL statement:
 select count(*) from node_checkpoints [42104-224]
-2024-04-03 10:54:36.207000Z jdbc[3]: exception
+2024-07-30 10:41:53.056620Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DATABASECHANGELOGLOCK" not found; SQL statement:
 SELECT COUNT(*) FROM PUBLIC.DATABASECHANGELOGLOCK [42102-224]
-2024-04-03 10:54:39.077000Z jdbc[3]: exception
+2024-07-30 10:41:55.214298Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.RELEVANCY_STATUS" not found; SQL statement:
 select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -21,7 +21,7 @@ select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
 	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
 	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:94)
-	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:111)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
 	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
 	at liquibase.precondition.core.ColumnExistsPrecondition.checkFast(ColumnExistsPrecondition.java:164)
 	at liquibase.precondition.core.ColumnExistsPrecondition.check(ColumnExistsPrecondition.java:82)
@@ -66,21 +66,20 @@ select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at liquibase.Liquibase.update(Liquibase.java:207)
 	at liquibase.Liquibase.update(Liquibase.java:197)
 	at net.corda.nodeapi.internal.persistence.SchemaMigration.runMigration(SchemaMigration.kt:77)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:477)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:202)
-	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1419)
-	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:474)
-	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:497)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:466)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:463)
+	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1403)
+	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:463)
+	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:481)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli$runProgram$2.run(RunMigrationScriptsCli.kt:25)
 	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:230)
-	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:169)
-	at net.corda.node.internal.NodeStartupLogging$DefaultImpls.attempt(NodeStartup.kt:561)
-	at net.corda.node.internal.NodeStartup.attempt(NodeStartup.kt:169)
+	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:229)
+	at net.corda.node.internal.NodeStartupLogging.attempt(NodeStartup.kt:558)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun(NodeStartup.kt:229)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun$default(NodeStartup.kt:181)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli.runProgram(RunMigrationScriptsCli.kt:23)
 	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:153)
-	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:116)
+	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:107)
 	at picocli.CommandLine.execute(CommandLine.java:1173)
 	at picocli.CommandLine.access$800(CommandLine.java:141)
 	at picocli.CommandLine$RunLast.handle(CommandLine.java:1367)
@@ -89,7 +88,7 @@ select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-224]
 	at picocli.CommandLine.parseWithHandlers(CommandLine.java:1526)
 	at net.corda.cliutils.CordaCliWrapperKt.start(CordaCliWrapper.kt:89)
 	at net.corda.node.Corda.main(Corda.kt:13)
-2024-04-03 10:54:39.802000Z jdbc[3]: exception
+2024-07-30 10:41:55.718787Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.CONSUMING_TX_ID" not found; SQL statement:
 select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -106,7 +105,7 @@ select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
 	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
 	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:94)
-	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:111)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
 	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
 	at liquibase.precondition.core.ColumnExistsPrecondition.checkFast(ColumnExistsPrecondition.java:164)
 	at liquibase.precondition.core.ColumnExistsPrecondition.check(ColumnExistsPrecondition.java:82)
@@ -151,21 +150,20 @@ select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at liquibase.Liquibase.update(Liquibase.java:207)
 	at liquibase.Liquibase.update(Liquibase.java:197)
 	at net.corda.nodeapi.internal.persistence.SchemaMigration.runMigration(SchemaMigration.kt:77)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:477)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:202)
-	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1419)
-	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:474)
-	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:497)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:466)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:463)
+	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1403)
+	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:463)
+	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:481)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli$runProgram$2.run(RunMigrationScriptsCli.kt:25)
 	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:230)
-	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:169)
-	at net.corda.node.internal.NodeStartupLogging$DefaultImpls.attempt(NodeStartup.kt:561)
-	at net.corda.node.internal.NodeStartup.attempt(NodeStartup.kt:169)
+	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:229)
+	at net.corda.node.internal.NodeStartupLogging.attempt(NodeStartup.kt:558)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun(NodeStartup.kt:229)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun$default(NodeStartup.kt:181)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli.runProgram(RunMigrationScriptsCli.kt:23)
 	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:153)
-	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:116)
+	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:107)
 	at picocli.CommandLine.execute(CommandLine.java:1173)
 	at picocli.CommandLine.access$800(CommandLine.java:141)
 	at picocli.CommandLine$RunLast.handle(CommandLine.java:1367)
@@ -174,7 +172,7 @@ select t.consuming_tx_id from PUBLIC.vault_states t where 0=1 [42122-224]
 	at picocli.CommandLine.parseWithHandlers(CommandLine.java:1526)
 	at net.corda.cliutils.CordaCliWrapperKt.start(CordaCliWrapper.kt:89)
 	at net.corda.node.Corda.main(Corda.kt:13)
-2024-04-03 10:54:40.826000Z jdbc[3]: exception
+2024-07-30 10:41:56.421547Z jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.STATE_MACHINE_RUN_ID" not found; SQL statement:
 select t.state_machine_run_id from PUBLIC.node_transactions t where 0=1 [42122-224]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -191,7 +189,7 @@ select t.state_machine_run_id from PUBLIC.node_transactions t where 0=1 [42122-2
 	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
 	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
 	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:94)
-	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:111)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
 	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
 	at liquibase.precondition.core.ColumnExistsPrecondition.checkFast(ColumnExistsPrecondition.java:164)
 	at liquibase.precondition.core.ColumnExistsPrecondition.check(ColumnExistsPrecondition.java:82)
@@ -236,21 +234,20 @@ select t.state_machine_run_id from PUBLIC.node_transactions t where 0=1 [42122-2
 	at liquibase.Liquibase.update(Liquibase.java:207)
 	at liquibase.Liquibase.update(Liquibase.java:197)
 	at net.corda.nodeapi.internal.persistence.SchemaMigration.runMigration(SchemaMigration.kt:77)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:477)
-	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:202)
-	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1419)
-	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:474)
-	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:497)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:466)
+	at net.corda.node.internal.AbstractNode$runDatabaseMigrationScripts$3.invoke(AbstractNode.kt:463)
+	at net.corda.node.internal.AbstractNodeKt.startHikariPool(AbstractNode.kt:1403)
+	at net.corda.node.internal.AbstractNode.runDatabaseMigrationScripts(AbstractNode.kt:463)
+	at net.corda.node.internal.Node.runDatabaseMigrationScripts(Node.kt:481)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli$runProgram$2.run(RunMigrationScriptsCli.kt:25)
 	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:230)
-	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:169)
-	at net.corda.node.internal.NodeStartupLogging$DefaultImpls.attempt(NodeStartup.kt:561)
-	at net.corda.node.internal.NodeStartup.attempt(NodeStartup.kt:169)
+	at net.corda.node.internal.NodeStartup$initialiseAndRun$5.invoke(NodeStartup.kt:229)
+	at net.corda.node.internal.NodeStartupLogging.attempt(NodeStartup.kt:558)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun(NodeStartup.kt:229)
 	at net.corda.node.internal.NodeStartup.initialiseAndRun$default(NodeStartup.kt:181)
 	at net.corda.node.internal.subcommands.RunMigrationScriptsCli.runProgram(RunMigrationScriptsCli.kt:23)
 	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:153)
-	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:116)
+	at net.corda.cliutils.CliWrapperBase.call(CordaCliWrapper.kt:107)
 	at picocli.CommandLine.execute(CommandLine.java:1173)
 	at picocli.CommandLine.access$800(CommandLine.java:141)
 	at picocli.CommandLine$RunLast.handle(CommandLine.java:1367)
