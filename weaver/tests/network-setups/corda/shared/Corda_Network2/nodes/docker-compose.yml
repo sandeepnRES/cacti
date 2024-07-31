@@ -11,7 +11,7 @@ services:
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/Notary/drivers:/opt/corda/drivers']
     environment: ['ACCEPT_LICENSE=${ACCEPT_LICENSE}']
     ports: [10003, 22022]
-    image: corda/community:4.12-zulu-openjdk8
+    image: corda/community:4.12-zulu-openjdk
   partya:
     volumes: ['/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyA/node.conf:/etc/corda/node.conf',
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyA/certificates:/opt/corda/certificates',
@@ -23,7 +23,7 @@ services:
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyA/drivers:/opt/corda/drivers']
     environment: ['ACCEPT_LICENSE=${ACCEPT_LICENSE}']
     ports: [10003, 22022]
-    image: corda/community:4.12-zulu-openjdk8
+    image: corda/community:4.12-zulu-openjdk
   partyb:
     volumes: ['/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyB/node.conf:/etc/corda/node.conf',
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyB/certificates:/opt/corda/certificates',
@@ -35,7 +35,7 @@ services:
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyB/drivers:/opt/corda/drivers']
     environment: ['ACCEPT_LICENSE=${ACCEPT_LICENSE}']
     ports: [10003, 22022]
-    image: corda/community:4.12-zulu-openjdk8
+    image: corda/community:4.12-zulu-openjdk
   partyc:
     volumes: ['/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyC/node.conf:/etc/corda/node.conf',
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyC/certificates:/opt/corda/certificates',
@@ -47,4 +47,4 @@ services:
       '/data/dlt-interop/cacti-s/weaver/tests/network-setups/corda/dev/Corda_Network2/build/nodes/PartyC/drivers:/opt/corda/drivers']
     environment: ['ACCEPT_LICENSE=${ACCEPT_LICENSE}']
     ports: [10003, 22022]
-    image: corda/community:4.12-zulu-openjdk8
+    image: corda/community:4.12-zulu-openjdk

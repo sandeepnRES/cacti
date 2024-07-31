@@ -124,7 +124,7 @@ task deployNodes(type: net.corda.plugins.Cordform) {
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
-    dockerImage = "corda/community:${corda_release_version}-zulu-openjdk8"
+    dockerImage = "corda/community:${corda_release_version}-zulu-openjdk"
     nodeDefaults {
         projectCordapp {
             deploy = false
