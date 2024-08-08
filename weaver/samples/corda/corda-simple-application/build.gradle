@@ -22,8 +22,6 @@ buildscript {
         clikt_version = constants.getProperty("cliktVersion")
         
         coroutines_version = constants.getProperty("coroutinesVersion")
-        bcprov_version = constants.getProperty("bcprovVersion")
-        bcprov_name = constants.getProperty("bcprovName")
         grpc_version = constants.getProperty("grpcVersion") // CURRENT_GRPC_VERSION
         grpc_kotlin_version = constants.getProperty("grpcKotlinVersion") // CURRENT_GRPC_KOTLIN_VERSION
         arrow_version = constants.getProperty("arrowVersion")
