@@ -121,6 +121,7 @@ dependencies {
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
     implementation "io.grpc:grpc-netty-shaded:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 }
