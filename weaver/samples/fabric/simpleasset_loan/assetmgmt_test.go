@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
-	"github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
-	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleasset_loan"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset_loan"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() in locker/recipient context

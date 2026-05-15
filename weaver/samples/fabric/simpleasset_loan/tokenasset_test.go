@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleasset_loan"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset_loan"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {
