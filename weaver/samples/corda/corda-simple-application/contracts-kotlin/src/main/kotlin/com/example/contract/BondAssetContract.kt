@@ -15,7 +15,6 @@ import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 import com.google.gson.Gson
-import com.google.protobuf.ByteString
 
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetExchangeHTLCState
@@ -82,7 +81,7 @@ class BondAssetContract : Contract {
                 
                 val assetState = if (assetStates.size == 1) assetStates[0] else htlcStates[0].assetStatePointer.resolve(tx).state.data as BondAssetState
                 val pledgeState = tx.outputsOfType<AssetPledgeState>()[0]
-                val pledgeCondition = Gson().fromJson(ByteString.copyFrom(pledgeState.pledgeCondition).toStringUtf8(), LoanRepaymentCondition::class.java)
+                val pledgeCondition = Gson().fromJson(String(pledgeState.pledgeCondition, Charsets.UTF_8), LoanRepaymentCondition::class.java)
                 
                 "Pledge asset should be same as in pledge condition." using (assetState.id == pledgeCondition.assetId
                     && assetState.type == pledgeCondition.assetType

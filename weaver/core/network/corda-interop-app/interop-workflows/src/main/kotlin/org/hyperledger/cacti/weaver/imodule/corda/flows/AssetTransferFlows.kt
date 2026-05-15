@@ -860,7 +860,7 @@ object ClaimRemoteAsset {
                         "Recipient should match in Pledge State and ClaimStatus" using (remotePledgeStatus.recipient == claimState.recipientCert)
                         "NetworkId should match in Pledge State and ClaimStatus" using (remotePledgeStatus.remoteNetworkID == claimState.localNetworkID)
             
-                        val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
+                        val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(claimState.pledgeId))
                         "The pledged asset should not have been claimed already" using (existingAssetClaimStatusState == null)
                     }
                 }

@@ -42,7 +42,7 @@ const claimAndPledgeAsset = async ({
     assetNetworkName: string
     tokenNetworkName: string
     contractId: string
-    hash: HashFunctions
+    hash: HashFunctions.Hash
     lender: string
     tokenLender: string
     tokenBorrower: string

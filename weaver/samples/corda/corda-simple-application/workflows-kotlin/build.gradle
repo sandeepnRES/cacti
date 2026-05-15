@@ -47,8 +47,8 @@ dependencies {
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     
     implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
-    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
-    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "$cacti_version")
+    cordapp(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
+    cordapp(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "$cacti_version")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"

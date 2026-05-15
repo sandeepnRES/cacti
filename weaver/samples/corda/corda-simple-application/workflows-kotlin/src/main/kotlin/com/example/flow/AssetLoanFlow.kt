@@ -8,8 +8,6 @@ package com.cordaSimpleApplication.flow
 
 import arrow.core.*
 import co.paralleluniverse.fibers.Suspendable
-import javassist.NotFoundException
-import sun.security.x509.UniqueIdentity
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -23,21 +21,16 @@ import net.corda.core.contracts.requireThat
 import net.corda.core.contracts.ReferencedStateAndRef
 import net.corda.core.contracts.TimeWindow
 import net.corda.core.contracts.Command
-import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.Party
 import net.corda.core.flows.*
 import net.corda.core.node.ServiceHub
-import net.corda.core.node.services.Vault
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.node.StatesToRecord
 import net.corda.core.serialization.CordaSerializable
 import net.corda.core.transactions.SignedTransaction
-import net.corda.core.transactions.LedgerTransaction
 import net.corda.core.transactions.TransactionBuilder
-import net.corda.core.utilities.ProgressTracker
-import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.utilities.unwrap
 
 import com.cordaSimpleApplication.state.AssetState
@@ -48,16 +41,12 @@ import com.cordaSimpleApplication.state.LoanRepaymentCondition
 import com.cordaSimpleApplication.contract.BondAssetContract
 import com.cordaSimpleApplication.contract.AssetContract
 
-import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetClaimStatusState
-import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetPledgeStatus
-import org.hyperledger.cacti.weaver.imodule.corda.flows.AssetPledgeStateToProtoBytes
 import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetPledgeStateById
 import org.hyperledger.cacti.weaver.imodule.corda.flows.GetExternalStateAndRefByLinearId
 import org.hyperledger.cacti.weaver.imodule.corda.flows.GetExternalStateByLinearId
 import org.hyperledger.cacti.weaver.imodule.corda.flows.RetrieveNetworkIdStateAndRef
 import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetExchangeHTLCStateById
 import org.hyperledger.cacti.weaver.imodule.corda.flows.parseExternalStateForPledgeStatus
-import org.hyperledger.cacti.weaver.imodule.corda.flows.parseExternalStateForClaimStatus
 
 import org.hyperledger.cacti.weaver.imodule.corda.contracts.AssetTransferContract
 import org.hyperledger.cacti.weaver.imodule.corda.contracts.AssetExchangeHTLCStateContract
