@@ -1,0 +1,10 @@
+{
+  "a210": {
+    "assetType": "bond11",
+    "id": "a210",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "300",
+    "maturitydate": "05 May 47 00:00 MST"
+  }
+}

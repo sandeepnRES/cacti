@@ -54,8 +54,10 @@ fun issueBondAssetStateHelper(assetId: String, assetType: String, config: Map<St
     try {
         println("IssueBondAssetState flow with arguments, assetId: $assetId, assetType: $assetType")
         val proxy = rpc.proxy
+        val _t0 = System.nanoTime()
         val createdState = proxy.startFlow(::IssueBondAssetState, assetId, assetType)
                 .returnValue.get().tx.outputStates.first() as BondAssetState
+        println("issue-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
         println(createdState)
     } catch (e: Exception) {
         println(e.toString())
@@ -109,8 +111,10 @@ class GetBondAssetStatesByTypeCommand : CliktCommand(name = "get-assets-by-type"
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
+            val _t0 = System.nanoTime()
             val states = proxy.startFlow(::GetStatesByBondAssetType, assetType)
                 .returnValue.get()
+            println("get-assets-by-type: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
             println(states.toString(Charsets.UTF_8))
         } catch (e: Exception) {
             println(e.toString())

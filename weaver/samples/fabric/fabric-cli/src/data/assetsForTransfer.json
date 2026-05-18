@@ -14,21 +14,5 @@
     "issuer": "treasury",
     "facevalue": "700",
     "maturitydate": "01 Jul 45 00:00 MST"
-  },
-  "a24": {
-    "assetType": "bond01",
-    "id": "a24",
-    "owner": "bob",
-    "issuer": "treasury",
-    "facevalue": "500",
-    "maturitydate": "01 Jan 45 00:00 MST"
-  },
-  "a25": {
-    "assetType": "bond01",
-    "id": "a25",
-    "owner": "bob",
-    "issuer": "treasury",
-    "facevalue": "700",
-    "maturitydate": "01 Jul 45 00:00 MST"
   }
 }

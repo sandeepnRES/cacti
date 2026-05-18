@@ -668,10 +668,14 @@ async function query(
       userString: userString,
       registerUser: registerUser,
     });
+    logger.debug(`hello: ${invocationSpec.ccFunc} ${JSON.stringify(invocationSpec.args)}`)
+    console.time('query');
     const read = await contract.evaluateTransaction(
       invocationSpec.ccFunc,
       ...invocationSpec.args,
     );
+    console.timeEnd('query');
+    logger.debug(read);
     const state = Buffer.from(read).toString();
     if (state) {
       logger.debug(`State From Network:`, state);

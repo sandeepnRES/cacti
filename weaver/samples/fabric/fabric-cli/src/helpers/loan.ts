@@ -161,7 +161,7 @@ const pledgeTokens = async ({
     	assetId: loanedAssetId,
     	assetLedgerId: assetNetworkName,
     	assetLedgerLenderCert: lenderAssetCert,
-    	assetLedgerBorrowerCertsuer: borrowerAssetCert
+    	assetLedgerBorrowerCert: borrowerAssetCert
     }
     const loanRepaymentConditionJSONStr = JSON.stringify(loanRepaymentConditionJSON)
 

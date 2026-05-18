@@ -5,6 +5,7 @@ amount=$2
 
 NETWORK_NAME=Corda_Network2 CORDA_PORT=30012 ./clients/build/install/clients/bin/clients issue-asset-state $amount $tokentype
 NETWORK_NAME=Corda_Network CORDA_PORT=10009 ./clients/build/install/clients/bin/clients bond issue-asset $bondid $bondtype
+NETWORK_NAME=Corda_Network CORDA_PORT=10009 ./clients/build/install/clients/bin/clients bond get-assets-by-type $bondtype
 
 # 10006: PartyA (issuer), 10009: PartyB (borrower), 10012: PartyC (lender) Asset Network 1
 # 30006: PartyA (issuer), 30009: PartyB (borrower), 30012: PartyC (lender) Token Network 2

@@ -78,23 +78,23 @@ initialise-vault-asset-transfer:
 	fi
 	bash scripts/initNetworkId.sh
 
-.PHONY: initialise-vault-asset-loan
-initialise-vault-asset-loan: gen-asset-loan-policies
+.PHONY: initialise-vault-asset-loan-docker
+initialise-vault-asset-loan-docker: gen-asset-loan-policies-docker
 	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
-		./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" ./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
 	fi
 	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
-		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
+		CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" ./clients/build/install/clients/bin/clients configure network -p "O=PartyB, L=London, C=GB;O=PartyC, L=London, C=GB"; \
 	fi
 	bash scripts/initNetworkId.sh
 
-.PHONY: gen-asset-loan-policies
-gen-asset-loan-policies:
+.PHONY: gen-asset-loan-policies-docker
+gen-asset-loan-policies-docker:
 	if [ $(shell docker ps | grep corda_partya_1 | wc -l) -eq 1 ]; then \
-		LOCAL_FLOW="localhost:10006;localhost:10012#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="localhost:30006;localhost:30009#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyC" ./clients/build/install/clients/bin/clients configure create-all; \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" LOCAL_FLOW="corda_partya_1:10003;corda_partyc_1:10003#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="corda_network2_partya_1:10003;corda_network2_partyb_1:10003#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyC" ./clients/build/install/clients/bin/clients configure create-all; \
 	fi
 	if [ $(shell docker ps | grep corda_network2_partya_1 | wc -l) -eq 1 ]; then \
-		NETWORK_NAME=Corda_Network2 LOCAL_FLOW="localhost:30006;localhost:30009#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="localhost:10006;localhost:10012#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyB" ./clients/build/install/clients/bin/clients configure create-all; \
+		MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" NETWORK_NAME=Corda_Network2 LOCAL_FLOW="corda_network2_partya_1:10003;corda_network2_partyb_1:10003#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*" REMOTE_FLOW="corda_partya_1:10003;corda_partyc_1:10003#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*" NODES_LIST="PartyA,PartyB,PartyC" VERIFICATION_CRITERIA="PartyA,PartyB" ./clients/build/install/clients/bin/clients configure create-all; \
 	fi
 
 .PHONY: initialise-vault-asset-transfer-docker

@@ -129,10 +129,12 @@ const addAssets = ({
     }
     console.log(currentQuery);
     try {
+      console.time('createAsset');
       const read = await contract.submitTransaction(
         currentQuery.ccFunc,
         ...currentQuery.args,
       );
+      console.timeEnd('createAsset');
       const state = Buffer.from(read).toString();
       if (state) {
         logger.debug(`Response From Network: ${state}`);

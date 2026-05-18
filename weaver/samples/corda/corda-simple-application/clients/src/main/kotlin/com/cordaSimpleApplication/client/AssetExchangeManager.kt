@@ -74,31 +74,35 @@ class LockAssetCommand : CliktCommand(
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 hash.setSerializedHashBase64(hashBase64!!)
                 if (fungible) {
+                    val _t0 = System.nanoTime()
                     id = AssetManager.createFungibleHTLC(
-                        rpc.proxy, 
+                        rpc.proxy,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        recipient!!, 
-                        hash, 
-                        nTimeout, 
+                        recipient!!,
+                        hash,
+                        nTimeout,
                         1,                  // nTimeout represents Duration
-                        "com.cordaSimpleApplication.flow.RetrieveStateAndRef", 
+                        "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
                         AssetContract.Commands.Delete(),
                         issuer
                     )
+                    println("lock-fungible-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                 } else {
+                    val _t0 = System.nanoTime()
                     id = AssetManager.createHTLC(
-                        rpc.proxy, 
+                        rpc.proxy,
                         params[0],      // Type
                         params[1],      // ID
-                        recipient!!, 
-                        hash, 
-                        nTimeout,  
+                        recipient!!,
+                        hash,
+                        nTimeout,
                         1,              // nTimeout represents Duration
-                        "com.cordaSimpleApplication.flow.RetrieveBondAssetStateAndRef", 
+                        "com.cordaSimpleApplication.flow.RetrieveBondAssetStateAndRef",
                         BondAssetContract.Commands.Delete(),
                         issuer
                     )
+                    println("lock-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                 }
                 println("HTLC Lock State created with contract ID ${id}.")
             } catch (e: Exception) {
@@ -139,23 +143,27 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
                 hash.setPreimage(secret!!)
                 var res: Any
                 if (fungible) {
+                  val _t0 = System.nanoTime()
                   res = AssetManager.claimAssetInHTLC(
-                      rpc.proxy, 
-                      contractId!!, 
+                      rpc.proxy,
+                      contractId!!,
                       hash,
                       AssetContract.Commands.Issue(),
                       "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer",
                       issuer
                   )
+                  println("claim-fungible-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                 } else {
+                  val _t0 = System.nanoTime()
                   res = AssetManager.claimAssetInHTLC(
-                      rpc.proxy, 
-                      contractId!!, 
+                      rpc.proxy,
+                      contractId!!,
                       hash,
                       BondAssetContract.Commands.Issue(),
                       "com.cordaSimpleApplication.flow.UpdateBondAssetOwnerFromPointer",
                       issuer
                   )
+                  println("claim-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                 }
                 println("Asset Claim Response: ${res}")
             } catch (e: Exception) {

@@ -115,8 +115,11 @@ object AssetLoanManager {
                         obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                     }
                     val result = runCatching {
-                        rpc.proxy.startFlow(::ClaimAndPledgeAssetStateInitiator, contractId!!, claimInfoData, pledgeCondition, loan_period!!.toLong() * 24L * 3600L, issuer, obs)
+                        val _t0 = System.nanoTime()
+                        val _r = rpc.proxy.startFlow(::ClaimAndPledgeAssetStateInitiator, contractId!!, claimInfoData, pledgeCondition, loan_period!!.toLong() * 24L * 3600L, issuer, obs)
                             .returnValue.get()
+                        println("claim-and-pledge: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
+                        _r
                     }.fold({ it ->
                         it.map { pledgeId ->
                             println("Claim and Pledging asset was successful and the pledge state was stored with pledgeId $pledgeId.\n")
@@ -214,6 +217,7 @@ object AssetLoanManager {
                     val gson = GsonBuilder().create();
                     var marshalledPledgeCondition = gson.toJson(pledgeCondition, LoanRepaymentCondition::class.java)
 
+                    val _t0 = System.nanoTime()
                     val result = AssetTransferSDK.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
@@ -228,6 +232,7 @@ object AssetLoanManager {
                         obs,
                         marshalledPledgeCondition.toByteArray()
                     )
+                    println("pledge-repayment-tokens: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                     
                     
                     when (result) {
@@ -316,6 +321,7 @@ object AssetLoanManager {
                     
                     val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
                     val replaceIndex = 1
+                    val _t0 = System.nanoTime()
                     interopFlowHelper(
                         assetRelayAddress!!,
                         externalStateAddress,
@@ -325,7 +331,8 @@ object AssetLoanManager {
                         rpc.proxy,
                         config,
                         listOf(issuer)
-                    ) 
+                    )
+                    println("claim-asset: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
 
                     println("Loaned asset claim by borrower successful")
                 } catch (e: Exception) {
@@ -407,6 +414,7 @@ object AssetLoanManager {
 
                     val flowArgs = listOf(pledgeId!!, arrayOf<String>(), issuer, obs)
                     val replaceIndex = 1
+                    val _t0 = System.nanoTime()
                     interopFlowHelper(
                         tokenRelayAddress!!,
                         externalStateAddress,
@@ -416,7 +424,8 @@ object AssetLoanManager {
                         rpc.proxy,
                         config,
                         listOf(issuer)
-                    ) 
+                    )
+                    println("claim-repayment: %.3fs".format((System.nanoTime() - _t0) / 1_000_000_000.0))
                     println("Loan repayment claim by lender response")
                 } catch (e: Exception) {
                     println("Error: ${e.toString()}")
