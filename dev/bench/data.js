@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782736683191,
+  "lastUpdate": 1782737579462,
   "repoUrl": "https://github.com/sandeepnRES/cacti",
   "entries": {
     "Benchmark": [
@@ -166,6 +166,35 @@ window.BENCHMARK_DATA = {
             "range": "±2.07%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "3a0aadadcaff383d5b1f9f3db464336939972b9d",
+          "message": "ci: validate PR type and verify PR title matches commit message\n\nAssisted-by: Google:Gemini\nSigned-off-by: Sandeep Nishad <sandeepn.official@gmail.com>",
+          "timestamp": "2026-05-18T08:26:42Z",
+          "url": "https://github.com/sandeepnRES/cacti/commit/3a0aadadcaff383d5b1f9f3db464336939972b9d"
+        },
+        "date": 1782737577722,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 899,
+            "range": "±3.71%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
