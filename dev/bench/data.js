@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782384708495,
+  "lastUpdate": 1782736683191,
   "repoUrl": "https://github.com/sandeepnRES/cacti",
   "entries": {
     "Benchmark": [
@@ -130,6 +130,42 @@ window.BENCHMARK_DATA = {
             "range": "±4.13%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "3a0aadadcaff383d5b1f9f3db464336939972b9d",
+          "message": "ci: validate PR type and verify PR title matches commit message\n\nAssisted-by: Google:Gemini\nSigned-off-by: Sandeep Nishad <sandeepn.official@gmail.com>",
+          "timestamp": "2026-05-18T08:26:42Z",
+          "url": "https://github.com/sandeepnRES/cacti/commit/3a0aadadcaff383d5b1f9f3db464336939972b9d"
+        },
+        "date": 1782736680899,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 651,
+            "range": "±2.86%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 667,
+            "range": "±2.07%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
