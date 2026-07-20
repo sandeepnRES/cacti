@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784544966739,
+  "lastUpdate": 1784545025697,
   "repoUrl": "https://github.com/sandeepnRES/cacti",
   "entries": {
     "Benchmark": [
@@ -554,6 +554,35 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 858,
             "range": "±3.36%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeep.nishad1@ibm.com"
+          },
+          "id": "6718aa202a953dee281d69d5f588cf2ce68270e9",
+          "message": "ci: harden gradle wrapper trust chain and drop unused Corda jars\n\nAdds two defense-in-depth measures for the Corda-side Java build:\n\n- validate-gradle-wrappers job in checks-and-build.yaml runs\n  gradle/actions/wrapper-validation on every PR, verifying each of\n  the six committed gradle-wrapper.jar files against Gradle's\n  published known-good hashes. Catches wrapper-jar tampering.\n- distributionSha256Sum pinned to gradle-7.6.1-all.zip's official\n  SHA-256 in all six gradle-wrapper.properties files. Catches\n  compromised or altered distribution downloads at bootstrap.\n\nAlso removes two empty CorDapp jars flagged by Scorecard's\nBinary-Artifacts check:\n\n- weaver/tests/network-setups/corda/shared/Corda_Network/libs/\n  Corda_Network-0.1.jar\n- weaver/tests/network-setups/corda/shared/Corda_Network2/libs/\n  Corda_Network2-0.1.jar\n\nBoth contained only META-INF/MANIFEST.MF (25 bytes, no bytecode) —\nGradle jar-task byproducts snapshotted into shared/ years ago.\nNothing in the test flow consumes them: docker-compose doesn't\nmount libs/, and start-nodes.sh copies real CorDapps from\nshared/artifacts/. The now-empty libs/ parent directories are\nremoved too.\n\nAssisted-by: Claude Opus 4.8\n\nSigned-off-by: Sandeep Nishad <sandeepn.official@gmail.com>",
+          "timestamp": "2026-07-14T10:56:04Z",
+          "url": "https://github.com/sandeepnRES/cacti/commit/6718aa202a953dee281d69d5f588cf2ce68270e9"
+        },
+        "date": 1784545024192,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 894,
+            "range": "±3.51%",
             "unit": "ops/sec",
             "extra": "180 samples"
           }
